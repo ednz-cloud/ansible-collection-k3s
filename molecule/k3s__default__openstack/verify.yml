@@ -40,7 +40,7 @@
         - name: "Slurp file /etc/rancher/k3s/k3s.config.yml"
           ansible.builtin.slurp:
             src: "/etc/rancher/k3s/k3s.config.yml"
-          register: slurp_etc_consul_d_k3s_config_yml
+          register: slurp_etc_rancher_k3s_k3s_config_yml
 
         - name: "Verify directory /etc/rancher/k3s"
           ansible.builtin.assert:
@@ -60,7 +60,7 @@
               - stat_etc_rancher_k3s_k3s_config_yml.stat.pw_name == 'root'
               - stat_etc_rancher_k3s_k3s_config_yml.stat.gr_name == 'root'
               - stat_etc_rancher_k3s_k3s_config_yml.stat.mode == '0600'
-              - slurp_etc_consul_d_k3s_config_yml.content != ''
+              - slurp_etc_rancher_k3s_k3s_config_yml.content != ''
 
     - name: "Test: directory /var/lib/rancher/k3s"
       block:
@@ -134,3 +134,49 @@
               - ansible_facts.services['k3s.service']['source'] == 'systemd'
               - ansible_facts.services['k3s.service']['state'] == 'running'
               - ansible_facts.services['k3s.service']['status'] == 'enabled'
+
+    - name: "Test: k3s cluster nodes"
+      block:
+        - name: "Get k3s cluster nodes"
+          kubernetes.core.k8s_info:
+            kind: Node
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
+          register: k3s_nodes
+
+        - name: "Verify k3s cluster nodes"
+          ansible.builtin.assert:
+            that:
+              - k3s_nodes.resources | length > 0
+              - k3s_nodes.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
+
+    - name: "Test: k3s default namespaces"
+      block:
+        - name: "Get k3s namespaces"
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
+          register: k3s_namespaces
+
+        - name: "Verify k3s default namespaces"
+          ansible.builtin.assert:
+            that:
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'default') | list | length == 1
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'kube-system') | list | length == 1
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'kube-public') | list | length == 1
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'kube-node-lease') | list | length == 1
+
+    - name: "Test: k3s core system pods"
+      block:
+        - name: "Get k3s system pods"
+          kubernetes.core.k8s_info:
+            kind: Pod
+            namespace: kube-system
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
+          register: k3s_system_pods
+
+        - name: "Verify k3s core system pods"
+          ansible.builtin.assert:
+            that:
+              - k3s_system_pods.resources | length > 0
+              - k3s_system_pods.resources | selectattr('metadata.name', 'search', 'coredns') | list | length > 0
+              - k3s_system_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
