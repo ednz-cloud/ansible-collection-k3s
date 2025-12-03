@@ -98,7 +98,7 @@
       loop:
         - /tmp/{{ _k3s_shasum_file_name }}
 
-- name: "K3S | Copy systemd service file for nomad"
+- name: "K3S | Copy systemd service file for k3s"
   ansible.builtin.template:
     src: "k3s.service.j2"
     dest: "/etc/systemd/system/{{ k3s_service_name }}.service"
