@@ -3,13 +3,17 @@
   hosts: all
   become: true
   tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
     - name: Install required Python packages for verification
       ansible.builtin.apt:
         name:
           - python3-kubernetes
           - python3-yaml
         state: present
-        update_cache: true
 
     - name: Generate k3s server join token
       ansible.builtin.set_fact:
