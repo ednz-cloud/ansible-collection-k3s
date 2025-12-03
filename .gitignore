@@ -2,3 +2,7 @@
 **/__pycache__
 .vscode
 roles/ednz_cloud.*
+molecule/**/k3s_secret.yml
+
+# ignore local ansible test files
+.ansible
