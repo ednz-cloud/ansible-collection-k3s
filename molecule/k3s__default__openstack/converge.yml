@@ -3,6 +3,6 @@
   hosts: all
   become: true
   tasks:
-    - name: "Include ednz_cloud.k3s_ansible.k3s"
+    - name: "Include ednz_cloud.k3s.k3s"
       ansible.builtin.include_role:
-        name: "ednz_cloud.k3s_ansible.k3s"
+        name: "ednz_cloud.k3s.k3s"

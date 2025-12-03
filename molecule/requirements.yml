@@ -1,7 +1,7 @@
 ---
 # requirements file for molecule
 collections:
-  - name: ednz_cloud.hashistack
+  - name: ednz_cloud.k3s
   - name: kubernetes.core
     version: 6.2.0
   - name: openstack.cloud
