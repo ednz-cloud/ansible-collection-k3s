@@ -1,5 +1,0 @@
----
-roles:
-  - name: ednz_cloud.manage_apt_packages
-    src: https://github.com/ednz-cloud/manage_apt_packages.git
-    version: main
