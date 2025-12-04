@@ -66,6 +66,7 @@ jobs:
             test_user: "ubuntu"
         scenario:
           - k3s__default__openstack
+          - k3s__pinned_version__openstack
     steps:
       - name: Checkout
         uses: actions/checkout@v4

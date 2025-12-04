@@ -1,0 +1,196 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: "Test: binary /usr/local/bin/k3s"
+      block:
+        - name: "Stat binary /usr/local/bin/k3s"
+          ansible.builtin.stat:
+            path: "/usr/local/bin/k3s"
+          register: stat_usr_local_bin_k3s
+
+        - name: "Verify binary /usr/local/bin/k3s"
+          ansible.builtin.assert:
+            that:
+              - stat_usr_local_bin_k3s.stat.exists
+              - stat_usr_local_bin_k3s.stat.isreg
+              - stat_usr_local_bin_k3s.stat.pw_name == 'root'
+              - stat_usr_local_bin_k3s.stat.gr_name == 'root'
+              - stat_usr_local_bin_k3s.stat.mode == '0755'
+
+    - name: "Test: k3s version"
+      block:
+        - name: "Get k3s version"
+          ansible.builtin.command:
+            cmd: /usr/local/bin/k3s --version
+          register: k3s_version_output
+          changed_when: false
+
+        - name: "Verify k3s version"
+          ansible.builtin.assert:
+            that:
+              - "'v1.33.6+k3s1' in k3s_version_output.stdout"
+            fail_msg: "Expected k3s version v1.33.6+k3s1, but got: {{ k3s_version_output.stdout }}"
+            success_msg: "k3s version v1.33.6+k3s1 is correctly installed"
+
+    - name: "Test: directory /etc/rancher/k3s"
+      block:
+        - name: "Stat directory /etc/rancher/k3s"
+          ansible.builtin.stat:
+            path: "/etc/rancher/k3s"
+          register: stat_etc_rancher_k3s
+
+        - name: "Stat file /etc/rancher/k3s/k3s.env"
+          ansible.builtin.stat:
+            path: "/etc/rancher/k3s/k3s.env"
+          register: stat_etc_rancher_k3s_k3s_env
+
+        - name: "Stat file /etc/rancher/k3s/k3s.config.yml"
+          ansible.builtin.stat:
+            path: "/etc/rancher/k3s/k3s.config.yml"
+          register: stat_etc_rancher_k3s_k3s_config_yml
+
+        - name: "Slurp file /etc/rancher/k3s/k3s.config.yml"
+          ansible.builtin.slurp:
+            src: "/etc/rancher/k3s/k3s.config.yml"
+          register: slurp_etc_rancher_k3s_k3s_config_yml
+
+        - name: "Verify directory /etc/rancher/k3s"
+          ansible.builtin.assert:
+            that:
+              - stat_etc_rancher_k3s.stat.exists
+              - stat_etc_rancher_k3s.stat.isdir
+              - stat_etc_rancher_k3s.stat.pw_name == 'root'
+              - stat_etc_rancher_k3s.stat.gr_name == 'root'
+              - stat_etc_rancher_k3s.stat.mode == '0755'
+              - stat_etc_rancher_k3s_k3s_env.stat.exists
+              - stat_etc_rancher_k3s_k3s_env.stat.isreg
+              - stat_etc_rancher_k3s_k3s_env.stat.pw_name == 'root'
+              - stat_etc_rancher_k3s_k3s_env.stat.gr_name == 'root'
+              - stat_etc_rancher_k3s_k3s_env.stat.mode == '0600'
+              - stat_etc_rancher_k3s_k3s_config_yml.stat.exists
+              - stat_etc_rancher_k3s_k3s_config_yml.stat.isreg
+              - stat_etc_rancher_k3s_k3s_config_yml.stat.pw_name == 'root'
+              - stat_etc_rancher_k3s_k3s_config_yml.stat.gr_name == 'root'
+              - stat_etc_rancher_k3s_k3s_config_yml.stat.mode == '0600'
+              - slurp_etc_rancher_k3s_k3s_config_yml.content != ''
+
+    - name: "Test: directory /var/lib/rancher/k3s"
+      block:
+        - name: "Stat directory /var/lib/rancher/k3s"
+          ansible.builtin.stat:
+            path: "/var/lib/rancher/k3s"
+          register: stat_var_lib_rancher_k3s
+
+        - name: "Verify directory /var/lib/rancher/k3s"
+          ansible.builtin.assert:
+            that:
+              - stat_var_lib_rancher_k3s.stat.exists
+              - stat_var_lib_rancher_k3s.stat.isdir
+              - stat_var_lib_rancher_k3s.stat.pw_name == 'root'
+              - stat_var_lib_rancher_k3s.stat.gr_name == 'root'
+              - stat_var_lib_rancher_k3s.stat.mode == '0755'
+
+    - name: "Test: service k3s"
+      block:
+        - name: "Get service k3s"
+          ansible.builtin.service_facts:
+
+        - name: "Stat file /etc/systemd/system/k3s.service"
+          ansible.builtin.stat:
+            path: "/etc/systemd/system/k3s.service"
+          register: stat_etc_systemd_system_k3s_service
+
+        - name: "Slurp file /etc/systemd/system/k3s.service"
+          ansible.builtin.slurp:
+            src: "/etc/systemd/system/k3s.service"
+          register: slurp_etc_systemd_system_k3s_service
+
+        - name: "Verify service k3s"
+          vars:
+            k3s_expected_service_file: |
+              [Unit]
+              Description=Lightweight Kubernetes
+              Documentation=https://k3s.io
+              Wants=network-online.target
+              After=network-online.target
+
+              [Install]
+              WantedBy=multi-user.target
+
+              [Service]
+              Type=notify
+              EnvironmentFile=-/etc/rancher/k3s/k3s.env
+              KillMode=process
+              Delegate=yes
+              LimitNOFILE=1048576
+              LimitNPROC=infinity
+              LimitCORE=infinity
+              TasksMax=infinity
+              TimeoutStartSec=0
+              Restart=always
+              RestartSec=5s
+              ExecStartPre=/bin/sh -xc '! /usr/bin/systemctl is-enabled --quiet nm-cloud-setup.service 2>/dev/null'
+              ExecStartPre=-/sbin/modprobe br_netfilter
+              ExecStartPre=-/sbin/modprobe overlay
+              ExecStart=/usr/local/bin/k3s server --config /etc/rancher/k3s/k3s.config.yml
+          ansible.builtin.assert:
+            that:
+              - stat_etc_systemd_system_k3s_service.stat.exists
+              - stat_etc_systemd_system_k3s_service.stat.isreg
+              - stat_etc_systemd_system_k3s_service.stat.pw_name == 'root'
+              - stat_etc_systemd_system_k3s_service.stat.gr_name == 'root'
+              - stat_etc_systemd_system_k3s_service.stat.mode == '0644'
+              - (slurp_etc_systemd_system_k3s_service.content|b64decode) == k3s_expected_service_file
+              - ansible_facts.services['k3s.service'] is defined
+              - ansible_facts.services['k3s.service']['source'] == 'systemd'
+              - ansible_facts.services['k3s.service']['state'] == 'running'
+              - ansible_facts.services['k3s.service']['status'] == 'enabled'
+
+    - name: "Test: k3s cluster nodes"
+      block:
+        - name: "Get k3s cluster nodes"
+          kubernetes.core.k8s_info:
+            kind: Node
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
+          register: k3s_nodes
+
+        - name: "Verify k3s cluster nodes"
+          ansible.builtin.assert:
+            that:
+              - k3s_nodes.resources | length > 0
+              - k3s_nodes.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
+
+    - name: "Test: k3s default namespaces"
+      block:
+        - name: "Get k3s namespaces"
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
+          register: k3s_namespaces
+
+        - name: "Verify k3s default namespaces"
+          ansible.builtin.assert:
+            that:
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'default') | list | length == 1
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'kube-system') | list | length == 1
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'kube-public') | list | length == 1
+              - k3s_namespaces.resources | selectattr('metadata.name', 'equalto', 'kube-node-lease') | list | length == 1
+
+    - name: "Test: k3s core system pods"
+      block:
+        - name: "Get k3s system pods"
+          kubernetes.core.k8s_info:
+            kind: Pod
+            namespace: kube-system
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
+          register: k3s_system_pods
+
+        - name: "Verify k3s core system pods"
+          ansible.builtin.assert:
+            that:
+              - k3s_system_pods.resources | length > 0
+              - k3s_system_pods.resources | selectattr('metadata.name', 'search', 'coredns') | list | length > 0
+              - k3s_system_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
