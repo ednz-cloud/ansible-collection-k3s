@@ -28,58 +28,59 @@ Description: Install and configure k3s.
 
 | Var          | Type         | Value       |Required    | Title       |
 |--------------|--------------|-------------|------------|-------------|
-| [k3s_version](defaults/main.yml#L10)   | str | `v1.31.1+k3s1` |    true  |  K3s version |
-| [k3s_start_service](defaults/main.yml#L17)   | bool | `True` |    true  |  Start service |
-| [k3s_config_dir](defaults/main.yml#L24)   | str | `/etc/rancher/k3s` |    true  |  Configuration directory |
-| [k3s_data_dir](defaults/main.yml#L31)   | str | `/var/lib/rancher/k3s` |    true  |  Data directory |
-| [k3s_env_variables](defaults/main.yml#L39)   | dict | `{}` |    true  |  Environment variables |
-| [k3s_extra_files](defaults/main.yml#L46)   | bool | `False` |    true  |  Deploy extra files |
-| [k3s_extra_files_list](defaults/main.yml#L55)   | list | `[]` |    true  |  Extra files list |
-| [k3s_mode](defaults/main.yml#L63)   | str | `server` |    true  |  Node mode |
-| [k3s_join_addr](defaults/main.yml#L72)   | NoneType | `None` |    false  |  Join address |
-| [k3s_server_join_token](defaults/main.yml#L80)   | str | `CHANGEME!CHANGEME!CHANGEME!CHANGEME!` |    true  |  Server join token |
-| [k3s_agent_join_token](defaults/main.yml#L88)   | str | `{{ k3s_server_join_token }}` |    true  |  Agent join token |
-| [k3s_logging_options](defaults/main.yml#L97)   | dict | `{}` |    true  |  Logging options |
-| [k3s_server_cluster_init](defaults/main.yml#L108)   | bool | `False` |    true  |  Initialize cluster |
-| [k3s_server_listen_port](defaults/main.yml#L115)   | int | `6443` |    true  |  Server listen port |
-| [k3s_server_advertise_addr](defaults/main.yml#L123)   | str | `{{ ansible_default_ipv4.address }}` |    true  |  Server advertise address |
-| [k3s_server_tls_sans](defaults/main.yml#L131)   | list | `[]` |    true  |  TLS SANs |
-| [k3s_server_tls_sans.**0**](defaults/main.yml#L132)   | str | `{{ ansible_default_ipv4.address }}` |    None  |  None |
-| [k3s_server_tls_sans.**1**](defaults/main.yml#L133)   | str | `{{ ansible_hostname }}` |    None  |  None |
-| [k3s_server_enable_secrets_encryption](defaults/main.yml#L141)   | bool | `False` |    true  |  Enable secrets encryption |
-| [k3s_server_listeners_options](defaults/main.yml#L149)   | dict | `{}` |    true  |  Listener options |
-| [k3s_server_listeners_options.**bind-address**](defaults/main.yml#L150)   | str | `0.0.0.0` |    None  |  None |
-| [k3s_server_listeners_options.**https-listen-port**](defaults/main.yml#L151)   | int | `6443` |    None  |  None |
-| [k3s_server_listeners_options.**advertise-address**](defaults/main.yml#L152)   | str | `{{ k3s_server_advertise_addr }}` |    None  |  None |
-| [k3s_server_listeners_options.**advertise-port**](defaults/main.yml#L153)   | str | `{{ k3s_server_listen_port }}` |    None  |  None |
-| [k3s_server_datastore_options](defaults/main.yml#L162)   | dict | `{}` |    true  |  Datastore options |
-| [k3s_server_networking_options](defaults/main.yml#L170)   | dict | `{}` |    true  |  Networking options |
-| [k3s_server_networking_options.**cluster-cidr**](defaults/main.yml#L171)   | str | `10.42.0.0/16` |    None  |  None |
-| [k3s_server_networking_options.**service-cidr**](defaults/main.yml#L172)   | str | `10.43.0.0/16` |    None  |  None |
-| [k3s_server_networking_options.**service-node-port-range**](defaults/main.yml#L173)   | str | `30000-32767` |    None  |  None |
-| [k3s_server_networking_options.**cluster-dns**](defaults/main.yml#L174)   | str | `10.43.0.10` |    None  |  None |
-| [k3s_server_networking_options.**cluster-domain**](defaults/main.yml#L175)   | str | `cluster.local` |    None  |  None |
-| [k3s_server_networking_options.**flannel-backend**](defaults/main.yml#L176)   | str | `vxlan` |    None  |  None |
-| [k3s_server_components_options](defaults/main.yml#L185)   | dict | `{}` |    true  |  Component options |
-| [k3s_server_components_options.**disable**](defaults/main.yml#L186)   | list | `[]` |    None  |  None |
-| [k3s_server_components_options.disable.**0**](defaults/main.yml#L187)   | str | `traefik` |    None  |  None |
-| [k3s_server_components_options.disable.**1**](defaults/main.yml#L188)   | str | `local-storage` |    None  |  None |
-| [k3s_server_components_options.disable.**2**](defaults/main.yml#L189)   | str | `servicelb` |    None  |  None |
-| [k3s_server_experimental_options](defaults/main.yml#L197)   | dict | `{}` |    true  |  Experimental options |
-| [k3s_server_storage_class_options](defaults/main.yml#L205)   | dict | `{}` |    true  |  Storage class options |
-| [k3s_server_processes_flags_options](defaults/main.yml#L214)   | dict | `{}` |    true  |  Kubernetes process flags |
-| [k3s_agent_networking_options](defaults/main.yml#L225)   | dict | `{}` |    true  |  Agent networking options |
-| [k3s_agent_node_options](defaults/main.yml#L233)   | dict | `{}` |    true  |  Agent node options |
-| [k3s_agent_runtime_options](defaults/main.yml#L241)   | dict | `{}` |    true  |  Agent runtime options |
-| [k3s_agent_processes_flags_options](defaults/main.yml#L249)   | dict | `{}` |    true  |  Agent process flags |
-| [k3s_agent_experimental_options](defaults/main.yml#L257)   | dict | `{}` |    true  |  Agent experimental options |
+| [k3s_version](defaults/main.yml#L11)   | str | `latest` |    true  |  K3s version |
+| [k3s_start_service](defaults/main.yml#L18)   | bool | `True` |    true  |  Start service |
+| [k3s_config_dir](defaults/main.yml#L25)   | str | `/etc/rancher/k3s` |    true  |  Configuration directory |
+| [k3s_data_dir](defaults/main.yml#L32)   | str | `/var/lib/rancher/k3s` |    true  |  Data directory |
+| [k3s_env_variables](defaults/main.yml#L40)   | dict | `{}` |    true  |  Environment variables |
+| [k3s_extra_files](defaults/main.yml#L47)   | bool | `False` |    true  |  Deploy extra files |
+| [k3s_extra_files_list](defaults/main.yml#L56)   | list | `[]` |    true  |  Extra files list |
+| [k3s_mode](defaults/main.yml#L64)   | str | `server` |    true  |  Node mode |
+| [k3s_join_addr](defaults/main.yml#L73)   | NoneType | `None` |    false  |  Join address |
+| [k3s_server_join_token](defaults/main.yml#L81)   | str | `CHANGEME!CHANGEME!CHANGEME!CHANGEME!` |    true  |  Server join token |
+| [k3s_agent_join_token](defaults/main.yml#L89)   | str | `{{ k3s_server_join_token }}` |    true  |  Agent join token |
+| [k3s_logging_options](defaults/main.yml#L98)   | dict | `{}` |    true  |  Logging options |
+| [k3s_server_cluster_init](defaults/main.yml#L109)   | bool | `False` |    true  |  Initialize cluster |
+| [k3s_server_listen_port](defaults/main.yml#L116)   | int | `6443` |    true  |  Server listen port |
+| [k3s_server_advertise_addr](defaults/main.yml#L124)   | str | `{{ ansible_default_ipv4.address }}` |    true  |  Server advertise address |
+| [k3s_server_tls_sans](defaults/main.yml#L132)   | list | `[]` |    true  |  TLS SANs |
+| [k3s_server_tls_sans.**0**](defaults/main.yml#L133)   | str | `{{ ansible_default_ipv4.address }}` |    None  |  None |
+| [k3s_server_tls_sans.**1**](defaults/main.yml#L134)   | str | `{{ ansible_hostname }}` |    None  |  None |
+| [k3s_server_enable_secrets_encryption](defaults/main.yml#L142)   | bool | `False` |    true  |  Enable secrets encryption |
+| [k3s_server_listeners_options](defaults/main.yml#L150)   | dict | `{}` |    true  |  Listener options |
+| [k3s_server_listeners_options.**bind-address**](defaults/main.yml#L151)   | str | `0.0.0.0` |    None  |  None |
+| [k3s_server_listeners_options.**https-listen-port**](defaults/main.yml#L152)   | int | `6443` |    None  |  None |
+| [k3s_server_listeners_options.**advertise-address**](defaults/main.yml#L153)   | str | `{{ k3s_server_advertise_addr }}` |    None  |  None |
+| [k3s_server_listeners_options.**advertise-port**](defaults/main.yml#L154)   | str | `{{ k3s_server_listen_port }}` |    None  |  None |
+| [k3s_server_datastore_options](defaults/main.yml#L163)   | dict | `{}` |    true  |  Datastore options |
+| [k3s_server_networking_options](defaults/main.yml#L171)   | dict | `{}` |    true  |  Networking options |
+| [k3s_server_networking_options.**cluster-cidr**](defaults/main.yml#L172)   | str | `10.42.0.0/16` |    None  |  None |
+| [k3s_server_networking_options.**service-cidr**](defaults/main.yml#L173)   | str | `10.43.0.0/16` |    None  |  None |
+| [k3s_server_networking_options.**service-node-port-range**](defaults/main.yml#L174)   | str | `30000-32767` |    None  |  None |
+| [k3s_server_networking_options.**cluster-dns**](defaults/main.yml#L175)   | str | `10.43.0.10` |    None  |  None |
+| [k3s_server_networking_options.**cluster-domain**](defaults/main.yml#L176)   | str | `cluster.local` |    None  |  None |
+| [k3s_server_networking_options.**flannel-backend**](defaults/main.yml#L177)   | str | `vxlan` |    None  |  None |
+| [k3s_server_components_options](defaults/main.yml#L186)   | dict | `{}` |    true  |  Component options |
+| [k3s_server_components_options.**disable**](defaults/main.yml#L187)   | list | `[]` |    None  |  None |
+| [k3s_server_components_options.disable.**0**](defaults/main.yml#L188)   | str | `traefik` |    None  |  None |
+| [k3s_server_components_options.disable.**1**](defaults/main.yml#L189)   | str | `local-storage` |    None  |  None |
+| [k3s_server_components_options.disable.**2**](defaults/main.yml#L190)   | str | `servicelb` |    None  |  None |
+| [k3s_server_experimental_options](defaults/main.yml#L198)   | dict | `{}` |    true  |  Experimental options |
+| [k3s_server_storage_class_options](defaults/main.yml#L206)   | dict | `{}` |    true  |  Storage class options |
+| [k3s_server_processes_flags_options](defaults/main.yml#L215)   | dict | `{}` |    true  |  Kubernetes process flags |
+| [k3s_agent_networking_options](defaults/main.yml#L226)   | dict | `{}` |    true  |  Agent networking options |
+| [k3s_agent_node_options](defaults/main.yml#L234)   | dict | `{}` |    true  |  Agent node options |
+| [k3s_agent_runtime_options](defaults/main.yml#L242)   | dict | `{}` |    true  |  Agent runtime options |
+| [k3s_agent_processes_flags_options](defaults/main.yml#L250)   | dict | `{}` |    true  |  Agent process flags |
+| [k3s_agent_experimental_options](defaults/main.yml#L258)   | dict | `{}` |    true  |  Agent experimental options |
 <details>
 <summary><b>🖇️ Full descriptions for vars in defaults/main.yml</b></summary>
 <br>
 <table>
 <th>Var</th><th>Description</th>
 <tr><td><b>k3s_version</b></td><td>The version of k3s to install.<br>
-Must be a valid k3s release tag from the k3s-io/k3s repository.<br>
+Must be a valid k3s release tag from the k3s-io/k3s repository,<br>
+or 'latest'<br>
 Example: "v1.31.1+k3s1"<br></td></tr>
 <tr><td><b>k3s_start_service</b></td><td>Whether to start and enable the k3s service after installation.<br>
 Set to false if you want to manually manage the service.<br></td></tr>

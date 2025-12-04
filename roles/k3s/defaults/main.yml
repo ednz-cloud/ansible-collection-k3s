@@ -5,9 +5,10 @@
 # required: true
 # description-lines:
 # The version of k3s to install.
-# Must be a valid k3s release tag from the k3s-io/k3s repository.
+# Must be a valid k3s release tag from the k3s-io/k3s repository,
+# or 'latest'
 # Example: "v1.31.1+k3s1"
-k3s_version: "v1.31.1+k3s1"
+k3s_version: "latest"
 
 # title: Start service
 # required: true
