@@ -1,48 +1,172 @@
 ---
 # defaults file for k3s
+
+# title: K3s version
+# required: true
+# description-lines:
+# The version of k3s to install.
+# Must be a valid k3s release tag from the k3s-io/k3s repository.
+# Example: "v1.31.1+k3s1"
 k3s_version: "v1.31.1+k3s1"
+
+# title: Start service
+# required: true
+# description-lines:
+# Whether to start and enable the k3s service after installation.
+# Set to false if you want to manually manage the service.
 k3s_start_service: true
+
+# title: Configuration directory
+# required: true
+# description-lines:
+# Path to the k3s configuration directory.
+# This is where k3s.config.yml, tokens, and other config files will be stored.
 k3s_config_dir: /etc/rancher/k3s
+
+# title: Data directory
+# required: true
+# description-lines:
+# Path to the k3s data directory.
+# This is where k3s stores cluster data, including the datastore.
 k3s_data_dir: /var/lib/rancher/k3s
 
+# title: Environment variables
+# required: true
+# description-lines:
+# Dictionary of environment variables to pass to the k3s service.
+# These are written to the k3s.env file and loaded by systemd.
+# Example: { "HTTP_PROXY": "http://proxy:8080" }
 k3s_env_variables: {}
 
+# title: Deploy extra files
+# required: true
+# description-lines:
+# Whether to deploy extra files to the k3s configuration directory.
+# Set to true to enable deploying files from k3s_extra_files_list.
 k3s_extra_files: false
+
+# title: Extra files list
+# required: true
+# description-lines:
+# List of extra files to deploy to the k3s nodes.
+# Each item should have 'src' (local path) and 'dest' (remote path).
+# Files are templated using Jinja2 if they have .j2 extension.
+# Example: [{ src: "/path/to/file.yml.j2", dest: "/etc/rancher/k3s/file.yml" }]
 k3s_extra_files_list: []
 
+# title: Node mode
+# required: true
+# description-lines:
+# The mode in which k3s should run on this node.
+# Valid values are "server" (control plane) or "agent" (worker node).
+# Server nodes can also run workloads unless tainted.
 k3s_mode: server  # can be server or agent
 
-# Change this if you need nodes to join a cluster
+# title: Join address
+# required: false
+# description-lines:
+# The address of the k3s server to join.
+# Required for agent nodes and additional server nodes in HA setup.
+# Should be in format "https://server:6443"
+# Leave undefined for the first server node with cluster-init enabled.
 k3s_join_addr:
+
+# title: Server join token
+# required: true
+# description-lines:
+# Token used for server nodes to join the cluster.
+# IMPORTANT: Change this to a secure random value in production!
+# This token allows new servers to join the control plane.
 k3s_server_join_token: "CHANGEME!CHANGEME!CHANGEME!CHANGEME!"
+
+# title: Agent join token
+# required: true
+# description-lines:
+# Token used for agent nodes to join the cluster.
+# Defaults to the server token, but can be set separately for better security.
+# This token allows new agents to join as worker nodes.
 k3s_agent_join_token: "{{ k3s_server_join_token }}"
 
+# title: Logging options
+# required: true
+# description-lines:
+# Dictionary of logging configuration options for k3s.
 # See https://docs.k3s.io/cli/server#logging for server options
 # See https://docs.k3s.io/cli/agent#logging for agent options
+# Example: { "log": "/var/log/k3s.log", "log-format": "json" }
 k3s_logging_options: {}
 
 # Server configuration options
 # This is only merged to the configuration file if k3s_mode == 'server'
 
+# title: Initialize cluster
+# required: true
+# description-lines:
+# Whether to initialize a new cluster with embedded etcd.
+# Set to true ONLY on the first server node.
+# All other nodes should join using k3s_join_addr.
 k3s_server_cluster_init: false
+
+# title: Server listen port
+# required: true
+# description-lines:
+# The port on which the k3s API server listens.
+# Default is 6443 (standard Kubernetes API port).
 k3s_server_listen_port: 6443
+
+# title: Server advertise address
+# required: true
+# description-lines:
+# The IP address to advertise for the API server.
+# Defaults to the node's default IPv4 address.
+# Use a specific IP if the node has multiple interfaces.
 k3s_server_advertise_addr: "{{ ansible_default_ipv4.address }}"
+
+# title: TLS SANs
+# required: true
+# description-lines:
+# List of Subject Alternative Names (SANs) to add to the TLS certificate.
+# Should include all IPs and hostnames used to access the API server.
+# This allows connecting via load balancer IPs, DNS names, etc.
 k3s_server_tls_sans:
   - "{{ ansible_default_ipv4.address }}"
   - "{{ ansible_hostname }}"
+
+# title: Enable secrets encryption
+# required: true
+# description-lines:
+# Whether to enable encryption at rest for Kubernetes secrets.
+# When enabled, secrets are encrypted in etcd using AES-CBC.
+# Recommended for production clusters handling sensitive data.
 k3s_server_enable_secrets_encryption: false
 
+# title: Listener options
+# required: true
+# description-lines:
+# Dictionary of listener configuration options for the API server.
 # See https://docs.k3s.io/cli/server#listeners for configuration options
+# Controls bind addresses and advertised endpoints.
 k3s_server_listeners_options:
   bind-address: "0.0.0.0"
   https-listen-port: 6443
   advertise-address: "{{ k3s_server_advertise_addr }}"
   advertise-port: "{{ k3s_server_listen_port }}"
 
+# title: Datastore options
+# required: true
+# description-lines:
+# Dictionary of datastore configuration options.
 # See https://docs.k3s.io/cli/server#database for configuration options
+# Use this to configure external datastore (etcd, PostgreSQL, MySQL).
+# Example: { "datastore-endpoint": "postgres://user:pass@host:5432/k3s" }
 k3s_server_datastore_options: {}
 
+# title: Networking options
+# required: true
+# description-lines:
+# Dictionary of networking configuration options for the cluster.
 # See https://docs.k3s.io/cli/server#networking for configuration options
+# Controls pod/service CIDRs, CNI plugin, and DNS settings.
 k3s_server_networking_options:
   cluster-cidr: "10.42.0.0/16"
   service-cidr: "10.43.0.0/16"
@@ -51,36 +175,83 @@ k3s_server_networking_options:
   cluster-domain: "cluster.local"
   flannel-backend: vxlan
 
+# title: Component options
+# required: true
+# description-lines:
+# Dictionary of Kubernetes component configuration options.
 # See https://docs.k3s.io/cli/server#kubernetes-components for configuration options
+# Use 'disable' key to disable default k3s components.
+# By default, traefik, local-storage, and servicelb are disabled.
 k3s_server_components_options:
   disable:
     - traefik
     - local-storage
     - servicelb
 
+# title: Experimental options
+# required: true
+# description-lines:
+# Dictionary of experimental feature flags for k3s server.
 # See https://docs.k3s.io/cli/server#experimental-options for configuration options
+# Use with caution as these features may be unstable.
 k3s_server_experimental_options: {}
 
+# title: Storage class options
+# required: true
+# description-lines:
+# Dictionary of storage class configuration options.
 # See https://docs.k3s.io/cli/server#storage-class for configuration options
+# Configure default storage class behavior and local-path provisioner.
 k3s_server_storage_class_options: {}
 
+# title: Kubernetes process flags
+# required: true
+# description-lines:
+# Dictionary of custom flags for Kubernetes components.
 # See https://docs.k3s.io/cli/server#customized-flags-for-kubernetes-processes for configuration options
+# Allows passing custom flags to kube-apiserver, kube-controller-manager, etc.
+# Example: { "kube-apiserver-arg": ["enable-admission-plugins=PodSecurity"] }
 k3s_server_processes_flags_options: {}
 
 # Agent configuration options
 # This is only merged to the configuration file if k3s_mode == 'agent'
 
-# See https://docs.k3s.io/cli/agent#runtime for configuration options
+# title: Agent networking options
+# required: true
+# description-lines:
+# Dictionary of networking configuration options for agent nodes.
+# See https://docs.k3s.io/cli/agent#networking for configuration options
+# Configure node IP, VPN flags, and network-related settings.
 k3s_agent_networking_options: {}
 
+# title: Agent node options
+# required: true
+# description-lines:
+# Dictionary of node configuration options for agent nodes.
 # See https://docs.k3s.io/cli/agent#node for configuration options
+# Configure node labels, taints, and node-specific settings.
 k3s_agent_node_options: {}
 
-# See https://docs.k3s.io/cli/agent#networking for configuration options
+# title: Agent runtime options
+# required: true
+# description-lines:
+# Dictionary of container runtime configuration options for agent nodes.
+# See https://docs.k3s.io/cli/agent#runtime for configuration options
+# Configure containerd, image registry, and runtime-related settings.
 k3s_agent_runtime_options: {}
 
+# title: Agent process flags
+# required: true
+# description-lines:
+# Dictionary of custom flags for agent Kubernetes components.
 # See https://docs.k3s.io/cli/agent#customized-flags for configuration options
+# Allows passing custom flags to kubelet and kube-proxy.
 k3s_agent_processes_flags_options: {}
 
+# title: Agent experimental options
+# required: true
+# description-lines:
+# Dictionary of experimental feature flags for k3s agent.
 # See https://docs.k3s.io/cli/agent#experimental for configuration options
+# Use with caution as these features may be unstable.
 k3s_agent_experimental_options: {}

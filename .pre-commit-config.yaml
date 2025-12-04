@@ -18,3 +18,10 @@ repos:
         stages:
           - post-commit
           - push
+  - repo: local
+    hooks:
+      - id: docsible-check
+        name: Ensure docsible documentation is up-to-date
+        entry: ./.gitea/scripts/pre-commit-docsible.sh
+        language: script
+        pass_filenames: false

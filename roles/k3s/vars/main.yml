@@ -1,39 +1,135 @@
 ---
 # vars file for k3s
+
+# title: K3s binary path
+# required: true
+# description-lines:
+# Path to the k3s binary on the target system.
+# The k3s binary is installed to this location.
 k3s_binary_path: /usr/local/bin/k3s
+
+# title: Config file path
+# required: true
+# description-lines:
+# Path to the main k3s configuration file.
+# This YAML file contains all k3s configuration options.
 k3s_config_path: "{{ k3s_config_dir }}/k3s.config.yml"
+
+# title: Server token file path
+# required: true
+# description-lines:
+# Path to the file containing the server join token.
+# This token is used by server nodes to join the cluster.
 k3s_server_token_file_path: "{{ k3s_config_dir }}/server_token"
+
+# title: Agent token file path
+# required: true
+# description-lines:
+# Path to the file containing the agent join token.
+# This token is used by agent nodes to join the cluster.
 k3s_agent_token_file_path: "{{ k3s_config_dir }}/agent_token"
+
+# title: Service name
+# required: true
+# description-lines:
+# Name of the systemd service for k3s.
+# Used for service management operations.
 k3s_service_name: k3s
 
+# title: K3s user
+# required: true
+# description-lines:
+# The user account under which k3s runs.
+# Typically root for proper system access.
 k3s_user: root
+
+# title: K3s group
+# required: true
+# description-lines:
+# The group under which k3s runs.
+# Typically root for proper system access.
 k3s_group: root
 
+# title: GitHub API URL
+# required: true
+# description-lines:
+# Base URL for the GitHub API.
+# Used to query k3s releases and download information.
 k3s_github_api: https://api.github.com/repos
+
+# title: GitHub project
+# required: true
+# description-lines:
+# The GitHub repository path for k3s.
+# Format: owner/repository
 k3s_github_project: k3s-io/k3s
+
+# title: GitHub URL
+# required: true
+# description-lines:
+# Base URL for GitHub.
+# Used for constructing download URLs.
 k3s_github_url: https://github.com
 
+# title: Debian architecture map
+# required: true
+# description-lines:
+# Mapping of Ansible architecture names to Debian/k3s architecture names.
+# Used to determine the correct k3s binary to download.
 k3s_deb_architecture_map:
   x86_64: "amd64"
   aarch64: "arm64"
   armv7l: "arm"
   armv6l: "arm"
 
+# title: Architecture
+# required: true
+# description-lines:
+# The architecture of the target system.
+# Automatically determined from ansible_architecture using the map above.
 k3s_architecture: "{{ k3s_deb_architecture_map[ansible_architecture] | default(ansible_architecture) }}"
 
+# title: Default join address
+# required: true
+# description-lines:
+# Default address used when k3s_join_addr is not specified.
+# Points to localhost, indicating this is the first server node.
 k3s_default_join_addr: https://localhost:6443
 
+# title: Needs to join
+# required: true
+# description-lines:
+# Boolean indicating whether this node needs to join an existing cluster.
+# True if cluster-init is false AND a non-default join address is provided.
+# Used internally to determine if the node should join vs initialize.
 k3s_needs_to_join: >-
   {{
     (not k3s_server_cluster_init) and
     (k3s_join_addr | default(k3s_default_join_addr)) != k3s_default_join_addr
   }}
 
+# title: Write kubeconfig mode
+# required: true
+# description-lines:
+# File permissions for the generated kubeconfig file.
+# Default is 0644 (readable by all) for easier access.
+# Consider 0600 for stricter security in production.
 k3s_write_kubeconfig_mode: '0644'
 
+# title: Base configuration
+# required: true
+# description-lines:
+# Base configuration dictionary merged into all k3s configurations.
+# Sets the data directory for k3s cluster data.
 k3s_configuration:
   data-dir: "{{ k3s_data_dir }}"
 
+# title: Server configuration
+# required: true
+# description-lines:
+# Configuration dictionary specific to server nodes.
+# Includes cluster initialization, token files, TLS SANs, and join settings.
+# This is merged into k3s_configuration when k3s_mode is 'server'.
 k3s_server_configuration:
   cluster-init: "{{ k3s_server_cluster_init if k3s_server_cluster_init else omit }}"
   server: "{{ k3s_join_addr if k3s_needs_to_join else omit }}"
@@ -42,6 +138,12 @@ k3s_server_configuration:
   agent-token-file: "{{ k3s_agent_token_file_path }}"
   tls-san: "{{ k3s_server_tls_sans }}"
 
+# title: Agent configuration
+# required: true
+# description-lines:
+# Configuration dictionary specific to agent nodes.
+# Includes server address and token file for joining the cluster.
+# This is merged into k3s_configuration when k3s_mode is 'agent'.
 k3s_agent_configuration:
   server: "{{ k3s_join_addr }}"
   token-file: "{{ k3s_agent_token_file_path }}"

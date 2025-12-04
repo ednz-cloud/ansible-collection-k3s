@@ -1,10 +1,48 @@
 ---
 # defaults file for k3s_labels
 
+# title: Kubeconfig path
+# required: true
+# description-lines:
+# Path to the kubeconfig file used to authenticate with the k3s cluster.
+# This should point to the k3s-generated kubeconfig file on the server node.
 k3s_labels_kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"
+
+# title: Kubeconfig context
+# required: true
+# description-lines:
+# The kubectl context to use from the kubeconfig file.
+# Default is 'default', which is the standard context in k3s.
 k3s_labels_kubeconfig_context: default
+
+# title: Node name
+# required: true
+# description-lines:
+# The name of the Kubernetes node to manage labels for.
+# Defaults to the Ansible hostname, which matches the k3s node name.
 k3s_labels_node_name: "{{ ansible_hostname }}"
 
+# title: Keep default labels
+# required: true
+# description-lines:
+# Whether to preserve default Kubernetes labels on the node.
+# When true, protects standard labels like kubernetes.io/hostname, arch, os, etc.
+# Set to false if you want full control over node labels.
 k3s_labels_keep_default_labels: true
+
+# title: Labels to append
+# required: true
+# description-lines:
+# Dictionary of custom labels to add or update on the node.
+# These labels are merged with existing labels (or kept labels if specified).
+# Example: { "node-type": "worker", "disk-type": "ssd", "zone": "us-east-1a" }
 k3s_labels_append: {}
+
+# title: Labels to keep
+# required: true
+# description-lines:
+# List of specific label keys to retain on the node.
+# Labels not in this list (and not in default labels if enabled) will be removed.
+# Use this for selective label management.
+# Leave empty to not keep any specific labels beyond defaults.
 k3s_labels_keep: [""]

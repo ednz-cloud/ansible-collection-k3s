@@ -1,5 +1,13 @@
 ---
 # vars file for k3s_labels
+
+# title: Default Kubernetes labels
+# required: true
+# description-lines:
+# List of default Kubernetes label keys that should be protected from removal.
+# These are standard labels that Kubernetes and k3s use for node management.
+# When k3s_labels_keep_default_labels is true, these labels are preserved.
+# Includes architecture, OS, hostname, instance type, and node role labels.
 k3s_labels_default_labels:
   - beta.kubernetes.io/arch
   - beta.kubernetes.io/instance-type
