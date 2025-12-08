@@ -1,0 +1,8 @@
+---
+# Labels to apply during converge stage
+# Note: prepare stage labels should NOT be included here
+# to test label removal functionality
+k3s_labels_append:
+  converge-label: "true"
+  environment: "production"
+  managed-by: "molecule"

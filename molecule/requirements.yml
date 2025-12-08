@@ -6,3 +6,5 @@ collections:
     version: 6.2.0
   - name: openstack.cloud
     version: 2.4.1
+  - name: ansible.utils
+    version: 6.0.0

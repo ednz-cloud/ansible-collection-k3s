@@ -1,0 +1,85 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install required Python packages for verification
+      ansible.builtin.apt:
+        name:
+          - python3-kubernetes
+          - python3-yaml
+        state: present
+
+    - name: Generate k3s server join token
+      ansible.builtin.set_fact:
+        k3s_server_join_token: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=64) }}"
+      run_once: true
+      delegate_to: localhost
+      delegate_facts: true
+
+    - name: Create group_vars/all directory
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/group_vars/all"
+        state: directory
+        mode: '0755'
+      run_once: true
+      delegate_to: localhost
+
+    - name: Write k3s_secret.yml with generated token
+      ansible.builtin.copy:
+        content: |
+          ---
+          k3s_server_join_token: "{{ hostvars['localhost']['k3s_server_join_token'] }}"
+        dest: "{{ playbook_dir }}/group_vars/all/k3s_secret.yml"
+        mode: '0644'
+      run_once: true
+      delegate_to: localhost
+
+    - name: Install k3s on the target VM
+      ansible.builtin.include_role:
+        name: "ednz_cloud.k3s.k3s"
+
+    - name: Wait for k3s to be ready
+      ansible.builtin.wait_for:
+        path: /etc/rancher/k3s/k3s.yaml
+        state: present
+        timeout: 60
+
+    - name: Apply initial labels
+      ansible.builtin.include_role:
+        name: "ednz_cloud.k3s.k3s_labels"
+      vars:
+        k3s_labels_append:
+          prepare-label: "true"
+          initial-setup: "complete"
+          stage: "prepare"
+
+    - name: Wait for labels to be applied
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Verify initial labels are present
+      block:
+        - name: Get node information
+          kubernetes.core.k8s_info:
+            kind: Node
+            name: "{{ ansible_hostname }}"
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
+          register: node_info
+
+        - name: Assert initial labels exist
+          ansible.builtin.assert:
+            that:
+              - node_info.resources[0].metadata.labels['prepare-label'] is defined
+              - node_info.resources[0].metadata.labels['prepare-label'] == 'true'
+              - node_info.resources[0].metadata.labels['initial-setup'] is defined
+              - node_info.resources[0].metadata.labels['initial-setup'] == 'complete'
+              - node_info.resources[0].metadata.labels['stage'] is defined
+              - node_info.resources[0].metadata.labels['stage'] == 'prepare'
+            fail_msg: "Initial labels were not applied correctly during prepare stage"
+            success_msg: "Initial labels verified successfully in prepare stage"

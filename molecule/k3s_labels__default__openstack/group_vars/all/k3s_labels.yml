@@ -1,0 +1,4 @@
+---
+k3s_labels_append:
+  molecule-test: "true"
+  test-environment: "openstack"

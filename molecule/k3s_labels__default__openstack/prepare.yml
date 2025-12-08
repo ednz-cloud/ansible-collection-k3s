@@ -1,0 +1,45 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install required Python packages for verification
+      ansible.builtin.apt:
+        name:
+          - python3-kubernetes
+          - python3-yaml
+        state: present
+
+    - name: Generate k3s server join token
+      ansible.builtin.set_fact:
+        k3s_server_join_token: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=64) }}"
+      run_once: true
+      delegate_to: localhost
+      delegate_facts: true
+
+    - name: Create group_vars/all directory
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/group_vars/all"
+        state: directory
+        mode: '0755'
+      run_once: true
+      delegate_to: localhost
+
+    - name: Write k3s_secret.yml with generated token
+      ansible.builtin.copy:
+        content: |
+          ---
+          k3s_server_join_token: "{{ hostvars['localhost']['k3s_server_join_token'] }}"
+        dest: "{{ playbook_dir }}/group_vars/all/k3s_secret.yml"
+        mode: '0644'
+      run_once: true
+      delegate_to: localhost
+
+    - name: Install k3s on the target VM
+      ansible.builtin.include_role:
+        name: "ednz_cloud.k3s.k3s"

@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  tasks:
+    - name: "Include ednz_cloud.k3s.k3s_labels"
+      ansible.builtin.include_role:
+        name: "ednz_cloud.k3s.k3s_labels"
