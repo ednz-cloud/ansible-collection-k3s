@@ -10,7 +10,7 @@
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge, recursive=true)
           }}"
 
     - name: "K3S | Merge listeners configuration"
@@ -19,7 +19,7 @@
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge, recursive=true)
           }}"
 
     - name: "K3S | Merge datastore configuration"
@@ -28,7 +28,7 @@
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge, recursive=true)
           }}"
 
     - name: "K3S | Merge networking configuration"
@@ -37,7 +37,7 @@
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge, recursive=true)
           }}"
 
     - name: "K3S | Merge components configuration"
@@ -46,7 +46,7 @@
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge, recursive=true)
           }}"
 
     - name: "K3S | Merge processes flags configuration"
@@ -55,7 +55,7 @@
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge, recursive=true)
           }}"
 
     - name: "K3S | Merge experimental configuration"
@@ -64,7 +64,7 @@
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge, recursive=true)
           }}"
 
 - name: "K3S | Merge configuration for agent"
