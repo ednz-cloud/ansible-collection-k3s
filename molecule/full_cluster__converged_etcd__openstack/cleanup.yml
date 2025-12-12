@@ -1,0 +1,10 @@
+---
+- name: Cleanup
+  hosts: localhost
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Remove generated k3s_secret.yml
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/group_vars/k3s/k3s_secret.yml"
+        state: absent

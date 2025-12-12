@@ -1,0 +1,20 @@
+---
+- name: "K3S controller deployment"
+  hosts: k3s_controller
+  gather_facts: true
+  any_errors_fatal: true
+  become: true
+  tasks:
+    - name: "Include ednz_cloud.k3s_ansible.k3s"
+      ansible.builtin.include_role:
+        name: ednz_cloud.k3s_ansible.k3s
+
+- name: "K3S worker deployment"
+  hosts: k3s_worker
+  gather_facts: true
+  any_errors_fatal: true
+  become: true
+  tasks:
+    - name: "Include ednz_cloud.k3s_ansible.k3s"
+      ansible.builtin.include_role:
+        name: ednz_cloud.k3s_ansible.k3s

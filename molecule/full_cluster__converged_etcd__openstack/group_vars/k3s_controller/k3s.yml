@@ -1,0 +1,59 @@
+---
+k3s_env_variables: {}
+
+k3s_extra_files: false
+k3s_extra_files_list: []
+
+k3s_mode: server # can be server or agent
+
+# Change this if you need nodes to join a cluster
+k3s_join_addr: >-
+  https://{{
+    hostvars[groups['k3s_controller'][0]]['k3s_server_advertise_addr']
+  }}:{{
+    hostvars[groups['k3s_controller'][0]]['k3s_server_listen_port']
+  }}
+k3s_server_join_token: "{{ k3s_cluster_secret }}"
+k3s_agent_join_token: "{{ k3s_server_join_token }}"
+
+# See https://docs.k3s.io/cli/server#logging for server options
+# See https://docs.k3s.io/cli/agent#logging for agent options
+k3s_logging_options: {}
+
+# Server configuration options
+# This is only merged to the configuration file if k3s_mode == 'server'
+
+k3s_server_cluster_init: "{{ (inventory_hostname == groups['k3s_controller'][0]) | bool }}"
+k3s_server_listen_port: 6443
+k3s_server_advertise_addr: "{{ ansible_facts['enp3s0']['ipv4']['address'] }}"
+k3s_server_tls_sans:
+  - "{{ k3s_server_advertise_addr }}"
+  - "{{ ansible_hostname }}"
+  - "{{ inventory_hostname }}"
+k3s_server_enable_secrets_encryption: false
+
+# See https://docs.k3s.io/cli/server#listeners for configuration options
+k3s_server_listeners_options:
+  bind-address: "0.0.0.0"
+  https-listen-port: 6443
+  advertise-address: "{{ k3s_server_advertise_addr }}"
+  advertise-port: "{{ k3s_server_listen_port }}"
+
+# See https://docs.k3s.io/cli/server#database for configuration options
+k3s_server_datastore_options:
+  etcd-expose-metrics: true
+
+# See https://docs.k3s.io/cli/server#kubernetes-components for configuration options
+k3s_server_components_options:
+  disable:
+    - traefik
+    - local-storage
+    - servicelb
+
+k3s_server_processes_flags_options:
+  kube-controller-manager-arg:
+    - "bind-address={{ k3s_server_listeners_options['bind-address'] }}"
+  kube-scheduler-arg:
+    - "bind-address={{ k3s_server_listeners_options['bind-address'] }}"
+  kube-proxy-arg:
+    - "metrics-bind-address={{ k3s_server_listeners_options['bind-address'] }}"

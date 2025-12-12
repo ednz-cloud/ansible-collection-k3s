@@ -1,0 +1,147 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: molecule/requirements.yml
+    requirements-file: molecule/requirements.yml
+driver:
+  name: openstack
+platforms:
+  - name: molecule-k3s-controller-1.ednz.fr
+    description: Molecule test instance.
+    flavor: a2-ram4-disk20-perf1
+    image: ${MOLECULE_TEST_OS:-"Debian 13 trixie"}
+    user: ${MOLECULE_TEST_USER:-"debian"}
+    auto_ip: false
+    network:
+      name: pcp-w3rxsrj-backend-network
+      create: false
+    security_group:
+      name: molecule__full_cluster__converged_etcd__openstack
+      create: true
+      description: Molecule test security group.
+      rules:
+        - proto: tcp
+          port: -1
+          port_min: 0
+          port_max: 0
+          cidr: 0.0.0.0/0
+          type: IPv4
+    groups:
+      - k3s
+      - k3s_controller
+  - name: molecule-k3s-controller-2.ednz.fr
+    description: Molecule test instance.
+    flavor: a2-ram4-disk20-perf1
+    image: ${MOLECULE_TEST_OS:-"Debian 13 trixie"}
+    user: ${MOLECULE_TEST_USER:-"debian"}
+    auto_ip: false
+    network:
+      name: pcp-w3rxsrj-backend-network
+      create: false
+    security_group:
+      name: molecule__full_cluster__converged_etcd__openstack
+      create: true
+      description: Molecule test security group.
+      rules:
+        - proto: tcp
+          port: -1
+          port_min: 0
+          port_max: 0
+          cidr: 0.0.0.0/0
+          type: IPv4
+    groups:
+      - k3s
+      - k3s_controller
+  - name: molecule-k3s-controller-3.ednz.fr
+    description: Molecule test instance.
+    flavor: a2-ram4-disk20-perf1
+    image: ${MOLECULE_TEST_OS:-"Debian 13 trixie"}
+    user: ${MOLECULE_TEST_USER:-"debian"}
+    auto_ip: false
+    network:
+      name: pcp-w3rxsrj-backend-network
+      create: false
+    security_group:
+      name: molecule__full_cluster__converged_etcd__openstack
+      create: true
+      description: Molecule test security group.
+      rules:
+        - proto: tcp
+          port: -1
+          port_min: 0
+          port_max: 0
+          cidr: 0.0.0.0/0
+          type: IPv4
+    groups:
+      - k3s
+      - k3s_controller
+  - name: molecule-k3s-worker-1.ednz.fr
+    description: Molecule test instance.
+    flavor: a2-ram4-disk20-perf1
+    image: ${MOLECULE_TEST_OS:-"Debian 13 trixie"}
+    user: ${MOLECULE_TEST_USER:-"debian"}
+    auto_ip: false
+    network:
+      name: pcp-w3rxsrj-backend-network
+      create: false
+    security_group:
+      name: molecule__full_cluster__converged_etcd__openstack
+      create: true
+      description: Molecule test security group.
+      rules:
+        - proto: tcp
+          port: -1
+          port_min: 0
+          port_max: 0
+          cidr: 0.0.0.0/0
+          type: IPv4
+    groups:
+      - k3s
+      - k3s_worker
+  - name: molecule-k3s-worker-2.ednz.fr
+    description: Molecule test instance.
+    flavor: a2-ram4-disk20-perf1
+    image: ${MOLECULE_TEST_OS:-"Debian 13 trixie"}
+    user: ${MOLECULE_TEST_USER:-"debian"}
+    auto_ip: false
+    network:
+      name: pcp-w3rxsrj-backend-network
+      create: false
+    security_group:
+      name: molecule__full_cluster__converged_etcd__openstack
+      create: true
+      description: Molecule test security group.
+      rules:
+        - proto: tcp
+          port: -1
+          port_min: 0
+          port_max: 0
+          cidr: 0.0.0.0/0
+          type: IPv4
+    groups:
+      - k3s
+      - k3s_worker
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      remote_tmp: /tmp/.ansible
+  env:
+    ANSIBLE_ROLES_PATH: ../../roles/
+verifier:
+  name: ansible
+scenario:
+  name: full_cluster__converged_etcd__openstack
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - cleanup
+    - destroy

@@ -1,0 +1,39 @@
+---
+k3s_env_variables: {}
+
+k3s_extra_files: false
+k3s_extra_files_list: []
+
+k3s_mode: agent # can be server or agent
+
+# Change this if you need nodes to join a cluster
+k3s_join_addr: >-
+  https://{{
+    hostvars[groups['k3s_controller'][0]]['k3s_server_advertise_addr']
+  }}:{{
+    hostvars[groups['k3s_controller'][0]]['k3s_server_listen_port']
+  }}
+k3s_server_join_token: "{{ k3s_cluster_secret }}"
+k3s_agent_join_token: "{{ k3s_server_join_token }}"
+
+# See https://docs.k3s.io/cli/server#logging for server options
+# See https://docs.k3s.io/cli/agent#logging for agent options
+k3s_logging_options: {}
+
+# Agent configuration options
+# This is only merged to the configuration file if k3s_mode == 'agent'
+
+# See https://docs.k3s.io/cli/agent#runtime for configuration options
+k3s_agent_networking_options: {}
+
+# See https://docs.k3s.io/cli/agent#node for configuration options
+k3s_agent_node_options: {}
+
+# See https://docs.k3s.io/cli/agent#networking for configuration options
+k3s_agent_runtime_options: {}
+
+# See https://docs.k3s.io/cli/agent#customized-flags for configuration options
+k3s_agent_processes_flags_options: {}
+
+# See https://docs.k3s.io/cli/agent#experimental for configuration options
+k3s_agent_experimental_options: {}
