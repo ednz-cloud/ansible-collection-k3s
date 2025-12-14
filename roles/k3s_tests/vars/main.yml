@@ -1,0 +1,27 @@
+---
+# vars file for k3s_tests
+
+# title: K3s service file path
+# description-lines:
+# Path to the k3s systemd service file
+k3s_tests_service_file_path: "/etc/systemd/system/{{ k3s_tests_service_name }}.service"
+
+# title: K3s config file path
+# description-lines:
+# Path to the k3s main configuration file
+k3s_tests_config_file_path: "{{ k3s_tests_config_dir }}/k3s.config.yml"
+
+# title: K3s environment file path
+# description-lines:
+# Path to the k3s environment variables file
+k3s_tests_env_file_path: "{{ k3s_tests_config_dir }}/k3s.env"
+
+# title: Computed delegation target
+# description-lines:
+# Automatically computed delegation target based on k3s_tests_delegate_to setting
+k3s_tests_delegation_target: >-
+  {{
+    groups['k3s_controller'][0] if k3s_tests_delegate_to == 'auto' and 'k3s_controller' in groups
+    else k3s_tests_delegate_to if k3s_tests_delegate_to != ''
+    else omit
+  }}

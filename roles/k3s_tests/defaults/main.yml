@@ -1,0 +1,129 @@
+---
+# defaults file for k3s_tests
+
+# title: K3s tests to include
+# required: true
+# description-lines:
+# List of test modules to execute during verification.
+# Available tests:
+# - installation: Verify k3s binary, directories, config files, and systemd service
+# - cluster-health: Verify cluster nodes exist and are ready
+# - core-resources: Verify default namespaces and system pods are running
+# - labels: Verify node labels (apply/remove operations)
+# - workload: Deploy nginx workload with NodePort to verify cluster functionality
+# Example: ["installation", "cluster-health", "core-resources"]
+k3s_tests_include_tests: []
+
+# title: K3s binary path
+# required: false
+# description-lines:
+# Path to the k3s binary to verify.
+# Default: /usr/local/bin/k3s
+k3s_tests_binary_path: "/usr/local/bin/k3s"
+
+# title: K3s config directory
+# required: false
+# description-lines:
+# Path to the k3s configuration directory.
+# Default: /etc/rancher/k3s
+k3s_tests_config_dir: "/etc/rancher/k3s"
+
+# title: K3s data directory
+# required: false
+# description-lines:
+# Path to the k3s data directory.
+# Default: /var/lib/rancher/k3s
+k3s_tests_data_dir: "/var/lib/rancher/k3s"
+
+# title: K3s kubeconfig path
+# required: false
+# description-lines:
+# Path to the kubeconfig file for k3s cluster access.
+# Default: /etc/rancher/k3s/k3s.yaml
+k3s_tests_kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"
+
+# title: K3s service name
+# required: false
+# description-lines:
+# Name of the k3s systemd service.
+# Default: k3s
+k3s_tests_service_name: "k3s"
+
+# title: K3s mode
+# required: false
+# description-lines:
+# K3s mode (server or agent) for service file verification.
+# Default: server
+k3s_tests_mode: "server"
+
+# title: Expected node count
+# required: false
+# description-lines:
+# Expected number of cluster nodes (for cluster-health test).
+# Set to 0 to skip node count verification.
+# Default: 0
+k3s_tests_expected_node_count: 0
+
+# title: Expected labels
+# required: false
+# description-lines:
+# Dictionary of expected labels that should be present on the node.
+# Used by the labels test module.
+# Example: { "environment": "production", "managed-by": "molecule" }
+k3s_tests_expected_labels: {}
+
+# title: Absent labels
+# required: false
+# description-lines:
+# List of labels that should NOT be present on the node.
+# Used by the labels test module to verify label removal.
+# Example: ["prepare-label", "initial-setup", "stage"]
+k3s_tests_absent_labels: []
+
+# title: Delegate API tests to
+# required: false
+# description-lines:
+# Host to delegate Kubernetes API calls to (for multi-node scenarios).
+# Worker nodes don't have kubeconfig, so API calls should be delegated to a controller node.
+# Set to 'auto' to automatically delegate to first host in k3s_controller group.
+# Set to a specific hostname to delegate to that host.
+# Set to empty string '' to disable delegation (default for single-node tests).
+# Example: "auto" or "molecule-k3s-controller-1.ednz.fr"
+k3s_tests_delegate_to: ""
+
+# title: Workload test namespace
+# required: false
+# description-lines:
+# Namespace to use for workload test deployments.
+# Default: k3s-test-workload
+k3s_tests_workload_namespace: "k3s-test-workload"
+
+# title: Workload test name
+# required: false
+# description-lines:
+# Name prefix for workload test resources (deployment, service).
+# Default: nginx-test
+k3s_tests_workload_name: "nginx-test"
+
+# title: Workload test cleanup
+# required: false
+# description-lines:
+# Whether to cleanup workload test resources after verification.
+# Set to false to leave resources for manual inspection.
+# Default: true
+k3s_tests_workload_cleanup: true
+
+# title: Workload test image
+# required: false
+# description-lines:
+# Container image to use for workload testing.
+# Default: nginx:alpine
+k3s_tests_workload_image: "nginx:alpine"
+
+# title: Workload test NodePort
+# required: false
+# description-lines:
+# NodePort to use for workload service.
+# Set to 0 to let Kubernetes assign a random port.
+# Default: 30080
+k3s_tests_workload_nodeport: 30080

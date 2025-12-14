@@ -1,0 +1,76 @@
+---
+# tests/labels file for k3s_tests
+- name: "K3S Tests | Labels | Test expected labels are applied"
+  when: k3s_tests_expected_labels | length > 0
+  block:
+    - name: "K3S Tests | Labels | Get node labels"
+      kubernetes.core.k8s_info:
+        kind: Node
+        name: "{{ ansible_hostname }}"
+        kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+      delegate_to: "{{ k3s_tests_delegation_target }}"
+      register: _k3s_tests_node_labels
+
+    - name: "K3S Tests | Labels | Verify expected labels exist"
+      vars:
+        _k3s_tests_label_checks: >-
+          {{
+            k3s_tests_expected_labels.keys() |
+            map('extract', _k3s_tests_node_labels.resources[0].metadata.labels) |
+            zip(k3s_tests_expected_labels.values()) |
+            map('join', '==') |
+            list
+          }}
+      ansible.builtin.assert:
+        that:
+          - _k3s_tests_node_labels.resources[0].metadata.labels[item.key] is defined
+          - _k3s_tests_node_labels.resources[0].metadata.labels[item.key] == item.value
+        fail_msg: "Expected label {{ item.key }}={{ item.value }} was not applied correctly"
+        success_msg: "Expected label {{ item.key }}={{ item.value }} verified successfully"
+      loop: "{{ k3s_tests_expected_labels | dict2items }}"
+      loop_control:
+        loop_var: item
+        label: "{{ item.key }}"
+
+- name: "K3S Tests | Labels | Test absent labels are removed"
+  when: k3s_tests_absent_labels | length > 0
+  block:
+    - name: "K3S Tests | Labels | Get node labels"
+      kubernetes.core.k8s_info:
+        kind: Node
+        name: "{{ ansible_hostname }}"
+        kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+      delegate_to: "{{ k3s_tests_delegation_target }}"
+      register: _k3s_tests_node_absent_labels
+
+    - name: "K3S Tests | Labels | Verify absent labels are not present"
+      ansible.builtin.assert:
+        that:
+          - _k3s_tests_node_absent_labels.resources[0].metadata.labels[item] is not defined
+        fail_msg: "Label {{ item }} should have been removed but is still present"
+        success_msg: "Label {{ item }} was successfully removed"
+      loop: "{{ k3s_tests_absent_labels }}"
+      loop_control:
+        loop_var: item
+
+- name: "K3S Tests | Labels | Test default Kubernetes labels are preserved"
+  block:
+    - name: "K3S Tests | Labels | Get node labels"
+      kubernetes.core.k8s_info:
+        kind: Node
+        name: "{{ ansible_hostname }}"
+        kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+      delegate_to: "{{ k3s_tests_delegation_target }}"
+      register: _k3s_tests_node_default_labels
+
+    - name: "K3S Tests | Labels | Verify default labels are present"
+      ansible.builtin.assert:
+        that:
+          - _k3s_tests_node_default_labels.resources[0].metadata.labels['kubernetes.io/hostname'] is defined
+          - _k3s_tests_node_default_labels.resources[0].metadata.labels['kubernetes.io/arch'] is defined
+          - _k3s_tests_node_default_labels.resources[0].metadata.labels['kubernetes.io/os'] is defined
+          - _k3s_tests_node_default_labels.resources[0].metadata.labels['beta.kubernetes.io/arch'] is defined
+          - _k3s_tests_node_default_labels.resources[0].metadata.labels['beta.kubernetes.io/os'] is defined
+          - _k3s_tests_node_default_labels.resources[0].metadata.labels['node.kubernetes.io/instance-type'] is defined
+        fail_msg: "Default Kubernetes labels were not preserved"
+        success_msg: "Default Kubernetes labels were preserved correctly"

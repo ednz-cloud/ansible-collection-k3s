@@ -1,0 +1,30 @@
+---
+# meta file for k3s_tests
+galaxy_info:
+  namespace: "ednz_cloud"
+  role_name: "k3s_tests"
+  author: "Bertrand Lanson"
+  description: "Testing helper role for k3s collection molecule scenarios"
+  license: "license (BSD, MIT)"
+  min_ansible_version: "2.10"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+        - noble
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+  galaxy_tags:
+    - "ubuntu"
+    - "debian"
+    - "rancher"
+    - "kubernetes"
+    - "k8s"
+    - "k3s"
+    - "testing"
+    - "molecule"
+
+dependencies: []

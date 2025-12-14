@@ -1,0 +1,139 @@
+---
+# tests/instalations file for k3s_tests
+- name: "K3S Tests | Installation | Test binary {{ k3s_tests_binary_path }}"
+  block:
+    - name: "K3S Tests | Installation | Stat binary {{ k3s_tests_binary_path }}"
+      ansible.builtin.stat:
+        path: "{{ k3s_tests_binary_path }}"
+      register: _k3s_tests_stat_binary
+
+    - name: "K3S Tests | Installation | Verify binary {{ k3s_tests_binary_path }}"
+      ansible.builtin.assert:
+        that:
+          - _k3s_tests_stat_binary.stat.exists
+          - _k3s_tests_stat_binary.stat.isreg
+          - _k3s_tests_stat_binary.stat.pw_name == 'root'
+          - _k3s_tests_stat_binary.stat.gr_name == 'root'
+          - _k3s_tests_stat_binary.stat.mode == '0755'
+        fail_msg: "K3s binary verification failed"
+        success_msg: "K3s binary verified successfully"
+
+- name: "K3S Tests | Installation | Test directory {{ k3s_tests_config_dir }}"
+  block:
+    - name: "K3S Tests | Installation | Stat directory {{ k3s_tests_config_dir }}"
+      ansible.builtin.stat:
+        path: "{{ k3s_tests_config_dir }}"
+      register: _k3s_tests_stat_config_dir
+
+    - name: "K3S Tests | Installation | Stat file {{ k3s_tests_env_file_path }}"
+      ansible.builtin.stat:
+        path: "{{ k3s_tests_env_file_path }}"
+      register: _k3s_tests_stat_env_file
+
+    - name: "K3S Tests | Installation | Stat file {{ k3s_tests_config_file_path }}"
+      ansible.builtin.stat:
+        path: "{{ k3s_tests_config_file_path }}"
+      register: _k3s_tests_stat_config_file
+
+    - name: "K3S Tests | Installation | Slurp file {{ k3s_tests_config_file_path }}"
+      ansible.builtin.slurp:
+        src: "{{ k3s_tests_config_file_path }}"
+      register: _k3s_tests_slurp_config_file
+
+    - name: "K3S Tests | Installation | Verify directory {{ k3s_tests_config_dir }}"
+      ansible.builtin.assert:
+        that:
+          - _k3s_tests_stat_config_dir.stat.exists
+          - _k3s_tests_stat_config_dir.stat.isdir
+          - _k3s_tests_stat_config_dir.stat.pw_name == 'root'
+          - _k3s_tests_stat_config_dir.stat.gr_name == 'root'
+          - _k3s_tests_stat_config_dir.stat.mode == '0755'
+          - _k3s_tests_stat_env_file.stat.exists
+          - _k3s_tests_stat_env_file.stat.isreg
+          - _k3s_tests_stat_env_file.stat.pw_name == 'root'
+          - _k3s_tests_stat_env_file.stat.gr_name == 'root'
+          - _k3s_tests_stat_env_file.stat.mode == '0600'
+          - _k3s_tests_stat_config_file.stat.exists
+          - _k3s_tests_stat_config_file.stat.isreg
+          - _k3s_tests_stat_config_file.stat.pw_name == 'root'
+          - _k3s_tests_stat_config_file.stat.gr_name == 'root'
+          - _k3s_tests_stat_config_file.stat.mode == '0600'
+          - _k3s_tests_slurp_config_file.content != ''
+        fail_msg: "K3s configuration directory verification failed"
+        success_msg: "K3s configuration directory verified successfully"
+
+- name: "K3S Tests | Installation | Test directory {{ k3s_tests_data_dir }}"
+  block:
+    - name: "K3S Tests | Installation | Stat directory {{ k3s_tests_data_dir }}"
+      ansible.builtin.stat:
+        path: "{{ k3s_tests_data_dir }}"
+      register: _k3s_tests_stat_data_dir
+
+    - name: "K3S Tests | Installation | Verify directory {{ k3s_tests_data_dir }}"
+      ansible.builtin.assert:
+        that:
+          - _k3s_tests_stat_data_dir.stat.exists
+          - _k3s_tests_stat_data_dir.stat.isdir
+          - _k3s_tests_stat_data_dir.stat.pw_name == 'root'
+          - _k3s_tests_stat_data_dir.stat.gr_name == 'root'
+          - _k3s_tests_stat_data_dir.stat.mode == '0755'
+        fail_msg: "K3s data directory verification failed"
+        success_msg: "K3s data directory verified successfully"
+
+- name: "K3S Tests | Installation | Test service {{ k3s_tests_service_name }}"
+  block:
+    - name: "K3S Tests | Installation | Get service {{ k3s_tests_service_name }}"
+      ansible.builtin.service_facts:
+
+    - name: "K3S Tests | Installation | Stat file {{ k3s_tests_service_file_path }}"
+      ansible.builtin.stat:
+        path: "{{ k3s_tests_service_file_path }}"
+      register: _k3s_tests_stat_service_file
+
+    - name: "K3S Tests | Installation | Slurp file {{ k3s_tests_service_file_path }}"
+      ansible.builtin.slurp:
+        src: "{{ k3s_tests_service_file_path }}"
+      register: _k3s_tests_slurp_service_file
+
+    - name: "K3S Tests | Installation | Verify service {{ k3s_tests_service_name }}"
+      vars:
+        _k3s_tests_expected_service_file: |
+          [Unit]
+          Description=Lightweight Kubernetes
+          Documentation=https://k3s.io
+          Wants=network-online.target
+          After=network-online.target
+
+          [Install]
+          WantedBy=multi-user.target
+
+          [Service]
+          Type=notify
+          EnvironmentFile=-{{ k3s_tests_env_file_path }}
+          KillMode=process
+          Delegate=yes
+          LimitNOFILE=1048576
+          LimitNPROC=infinity
+          LimitCORE=infinity
+          TasksMax=infinity
+          TimeoutStartSec=0
+          Restart=always
+          RestartSec=5s
+          ExecStartPre=/bin/sh -xc '! /usr/bin/systemctl is-enabled --quiet nm-cloud-setup.service 2>/dev/null'
+          ExecStartPre=-/sbin/modprobe br_netfilter
+          ExecStartPre=-/sbin/modprobe overlay
+          ExecStart={{ k3s_tests_binary_path }} {{ k3s_tests_mode }} --config {{ k3s_tests_config_file_path }}
+      ansible.builtin.assert:
+        that:
+          - _k3s_tests_stat_service_file.stat.exists
+          - _k3s_tests_stat_service_file.stat.isreg
+          - _k3s_tests_stat_service_file.stat.pw_name == 'root'
+          - _k3s_tests_stat_service_file.stat.gr_name == 'root'
+          - _k3s_tests_stat_service_file.stat.mode == '0644'
+          - (_k3s_tests_slurp_service_file.content|b64decode) == _k3s_tests_expected_service_file
+          - ansible_facts.services[k3s_tests_service_name + '.service'] is defined
+          - ansible_facts.services[k3s_tests_service_name + '.service']['source'] == 'systemd'
+          - ansible_facts.services[k3s_tests_service_name + '.service']['state'] == 'running'
+          - ansible_facts.services[k3s_tests_service_name + '.service']['status'] == 'enabled'
+        fail_msg: "K3s service verification failed"
+        success_msg: "K3s service verified successfully"

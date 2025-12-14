@@ -1,0 +1,21 @@
+---
+# task/main file for k3s_tests
+- name: "K3S Tests | Include installation tests"
+  when: "'installation' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/installation.yml
+
+- name: "K3S Tests | Include cluster-health tests"
+  when: "'cluster-health' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/cluster-health.yml
+
+- name: "K3S Tests | Include core-resources tests"
+  when: "'core-resources' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/core-resources.yml
+
+- name: "K3S Tests | Include labels tests"
+  when: "'labels' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/labels.yml
+
+- name: "K3S Tests | Include workload tests"
+  when: "'workload' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/workload.yml

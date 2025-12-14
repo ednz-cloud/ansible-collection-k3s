@@ -1,0 +1,154 @@
+---
+# tests/workload file for k3s_tests
+- name: "K3S Tests | Workload | Create test namespace"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ k3s_tests_workload_namespace }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+
+- name: "K3S Tests | Workload | Deploy nginx test workload"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ k3s_tests_workload_name }}"
+        namespace: "{{ k3s_tests_workload_namespace }}"
+        labels:
+          app: "{{ k3s_tests_workload_name }}"
+          test: "molecule"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: "{{ k3s_tests_workload_name }}"
+        template:
+          metadata:
+            labels:
+              app: "{{ k3s_tests_workload_name }}"
+          spec:
+            containers:
+              - name: nginx
+                image: "{{ k3s_tests_workload_image }}"
+                ports:
+                  - containerPort: 80
+                    name: http
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+
+- name: "K3S Tests | Workload | Create NodePort service"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ k3s_tests_workload_name }}"
+        namespace: "{{ k3s_tests_workload_namespace }}"
+        labels:
+          app: "{{ k3s_tests_workload_name }}"
+          test: "molecule"
+      spec:
+        type: NodePort
+        selector:
+          app: "{{ k3s_tests_workload_name }}"
+        ports:
+          - port: 80
+            targetPort: 80
+            nodePort: "{{ k3s_tests_workload_nodeport if k3s_tests_workload_nodeport > 0 else omit }}"
+            protocol: TCP
+            name: http
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_workload_service
+
+- name: "K3S Tests | Workload | Wait for deployment to be ready"
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    name: "{{ k3s_tests_workload_name }}"
+    namespace: "{{ k3s_tests_workload_namespace }}"
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+    wait: true
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 300
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+
+- name: "K3S Tests | Workload | Get deployment status"
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    name: "{{ k3s_tests_workload_name }}"
+    namespace: "{{ k3s_tests_workload_namespace }}"
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_deployment_status
+
+- name: "K3S Tests | Workload | Get pod status"
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ k3s_tests_workload_namespace }}"
+    label_selectors:
+      - "app={{ k3s_tests_workload_name }}"
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_pod_status
+
+- name: "K3S Tests | Workload | Verify deployment and service"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_deployment_status.resources | length == 1
+      - _k3s_tests_deployment_status.resources[0].status.replicas == 1
+      - _k3s_tests_deployment_status.resources[0].status.availableReplicas == 1
+      - _k3s_tests_pod_status.resources | length > 0
+      - _k3s_tests_pod_status.resources[0].status.phase == 'Running'
+      - _k3s_tests_workload_service.result.spec.type == 'NodePort'
+      - _k3s_tests_workload_service.result.spec.ports | length > 0
+    fail_msg: "Workload deployment or service verification failed"
+    success_msg: "Workload successfully deployed and service exposed"
+  run_once: true
+
+- name: "K3S Tests | Workload | Cleanup test resources"
+  when: k3s_tests_workload_cleanup
+  block:
+    - name: "K3S Tests | Workload | Delete test namespace"
+      kubernetes.core.k8s:
+        state: absent
+        kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ k3s_tests_workload_namespace }}"
+      delegate_to: "{{ k3s_tests_delegation_target }}"
+      run_once: true
+
+    - name: "K3S Tests | Workload | Wait for namespace deletion"
+      kubernetes.core.k8s_info:
+        kind: Namespace
+        name: "{{ k3s_tests_workload_namespace }}"
+        kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+      delegate_to: "{{ k3s_tests_delegation_target }}"
+      run_once: true
+      register: _k3s_tests_namespace_check
+      until: _k3s_tests_namespace_check.resources | length == 0
+      retries: 60
+      delay: 3
+      failed_when: false
+
+    - name: "K3S Tests | Workload | Warn if namespace still exists"
+      when: _k3s_tests_namespace_check.resources | length > 0
+      ansible.builtin.debug:
+        msg: "Warning: Namespace {{ k3s_tests_workload_namespace }} still exists after cleanup attempt. It may be stuck in Terminating state due to API discovery issues. Manual cleanup may be required."
