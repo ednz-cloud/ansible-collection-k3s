@@ -4,88 +4,18 @@
   gather_facts: true
   become: true
   tasks:
-    - name: "Test: k3s service is running"
-      block:
-        - name: "Get service k3s"
-          ansible.builtin.service_facts:
-
-        - name: "Verify k3s service is running"
-          ansible.builtin.assert:
-            that:
-              - ansible_facts.services['k3s.service'] is defined
-              - ansible_facts.services['k3s.service']['state'] == 'running'
-              - ansible_facts.services['k3s.service']['status'] == 'enabled'
-
-    - name: "Test: k3s cluster node exists and is ready"
-      block:
-        - name: "Get k3s cluster nodes"
-          kubernetes.core.k8s_info:
-            kind: Node
-            kubeconfig: /etc/rancher/k3s/k3s.yaml
-          register: k3s_nodes
-
-        - name: "Verify k3s cluster node is ready"
-          ansible.builtin.assert:
-            that:
-              - k3s_nodes.resources | length == 1
-              - k3s_nodes.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
-
-    - name: "Test: converge labels are applied"
-      block:
-        - name: "Get node labels"
-          kubernetes.core.k8s_info:
-            kind: Node
-            name: "{{ ansible_hostname }}"
-            kubeconfig: /etc/rancher/k3s/k3s.yaml
-          register: k3s_node
-
-        - name: "Verify converge labels exist"
-          ansible.builtin.assert:
-            that:
-              - k3s_node.resources[0].metadata.labels['converge-label'] is defined
-              - k3s_node.resources[0].metadata.labels['converge-label'] == 'true'
-              - k3s_node.resources[0].metadata.labels['environment'] is defined
-              - k3s_node.resources[0].metadata.labels['environment'] == 'production'
-              - k3s_node.resources[0].metadata.labels['managed-by'] is defined
-              - k3s_node.resources[0].metadata.labels['managed-by'] == 'molecule'
-            fail_msg: "Converge labels were not applied correctly"
-            success_msg: "Converge labels verified successfully"
-
-    - name: "Test: prepare labels are removed"
-      block:
-        - name: "Get node labels"
-          kubernetes.core.k8s_info:
-            kind: Node
-            name: "{{ ansible_hostname }}"
-            kubeconfig: /etc/rancher/k3s/k3s.yaml
-          register: k3s_node_labels
-
-        - name: "Verify prepare labels are absent"
-          ansible.builtin.assert:
-            that:
-              - k3s_node_labels.resources[0].metadata.labels['prepare-label'] is not defined
-              - k3s_node_labels.resources[0].metadata.labels['initial-setup'] is not defined
-              - k3s_node_labels.resources[0].metadata.labels['stage'] is not defined
-            fail_msg: "Prepare labels were not removed correctly"
-            success_msg: "Prepare labels were successfully removed"
-
-    - name: "Test: default Kubernetes labels are preserved"
-      block:
-        - name: "Get node labels"
-          kubernetes.core.k8s_info:
-            kind: Node
-            name: "{{ ansible_hostname }}"
-            kubeconfig: /etc/rancher/k3s/k3s.yaml
-          register: k3s_node_default_labels
-
-        - name: "Verify default labels are present"
-          ansible.builtin.assert:
-            that:
-              - k3s_node_default_labels.resources[0].metadata.labels['kubernetes.io/hostname'] is defined
-              - k3s_node_default_labels.resources[0].metadata.labels['kubernetes.io/arch'] is defined
-              - k3s_node_default_labels.resources[0].metadata.labels['kubernetes.io/os'] is defined
-              - k3s_node_default_labels.resources[0].metadata.labels['beta.kubernetes.io/arch'] is defined
-              - k3s_node_default_labels.resources[0].metadata.labels['beta.kubernetes.io/os'] is defined
-              - k3s_node_default_labels.resources[0].metadata.labels['node.kubernetes.io/instance-type'] is defined
-            fail_msg: "Default Kubernetes labels were not preserved"
-            success_msg: "Default Kubernetes labels were preserved correctly"
+    - name: "Run k3s tests"
+      ansible.builtin.include_role:
+        name: ednz_cloud.k3s.k3s_tests
+      vars:
+        k3s_tests_include_tests:
+          - cluster-health
+          - labels
+        k3s_tests_expected_labels:
+          converge-label: "true"
+          environment: "production"
+          managed-by: "molecule"
+        k3s_tests_absent_labels:
+          - prepare-label
+          - initial-setup
+          - stage

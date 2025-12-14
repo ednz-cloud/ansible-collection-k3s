@@ -3,4 +3,16 @@
   hosts: all
   gather_facts: true
   become: true
-  tasks: []
+  tasks:
+    - name: "Run k3s tests"
+      ansible.builtin.include_role:
+        name: ednz_cloud.k3s.k3s_tests
+      vars:
+        k3s_tests_include_tests:
+          - installation
+          - cluster-health
+          - core-resources
+          - workload
+        k3s_tests_expected_node_count: 5
+        k3s_tests_delegate_to: "auto"
+        k3s_tests_mode: "{{ k3s_mode }}"
