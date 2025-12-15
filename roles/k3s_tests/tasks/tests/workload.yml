@@ -64,7 +64,7 @@
         ports:
           - port: 80
             targetPort: 80
-            nodePort: "{{ k3s_tests_workload_nodeport if k3s_tests_workload_nodeport > 0 else omit }}"
+            nodePort: 30080
             protocol: TCP
             name: http
   delegate_to: "{{ k3s_tests_delegation_target }}"

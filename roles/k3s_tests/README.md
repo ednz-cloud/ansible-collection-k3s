@@ -43,7 +43,6 @@ Description: Testing helper role for k3s collection molecule scenarios
 | [k3s_tests_workload_name](defaults/main.yml#L106)   | str | `nginx-test` |    false  |  Workload test name |
 | [k3s_tests_workload_cleanup](defaults/main.yml#L114)   | bool | `True` |    false  |  Workload test cleanup |
 | [k3s_tests_workload_image](defaults/main.yml#L121)   | str | `nginx:alpine` |    false  |  Workload test image |
-| [k3s_tests_workload_nodeport](defaults/main.yml#L129)   | int | `30080` |    false  |  Workload test NodePort |
 <details>
 <summary><b>🖇️ Full descriptions for vars in defaults/main.yml</b></summary>
 <br>
@@ -93,9 +92,6 @@ Set to false to leave resources for manual inspection.<br>
 Default: true<br></td></tr>
 <tr><td><b>k3s_tests_workload_image</b></td><td>Container image to use for workload testing.<br>
 Default: nginx:alpine<br></td></tr>
-<tr><td><b>k3s_tests_workload_nodeport</b></td><td>NodePort to use for workload service.<br>
-Set to 0 to let Kubernetes assign a random port.<br>
-Default: 30080<br></td></tr>
 </table>
 <br>
 </details>
