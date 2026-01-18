@@ -1,0 +1,26 @@
+spec:
+  inputs:
+    stage:
+      type: string
+      description: The stage to run the check on
+    commit-message:
+      type: string
+      description: Commit message to check
+    tags:
+      description: Tags to apply to this job
+      type: array
+      default: []
+    rules:
+      description: Rules for this job to run
+      type: array
+      default:
+        - when: never
+---
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
+"$[[ inputs.stage ]]:commitizen:check-commit":
+  stage: $[[ inputs.stage ]]
+  image: commitizen/commitizen:latest
+  script:
+    - cz check --message "$[[ inputs.commit-message ]]"
+  rules: $[[ inputs.rules ]]
+  tags: $[[ inputs.tags ]]

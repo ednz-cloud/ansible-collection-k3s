@@ -1,0 +1,9 @@
+---
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
+include:
+  - local: .gitlab-ci/actions/cz-commit-check.yml
+    inputs:
+      stage: gate
+      commit-message: $CI_COMMIT_MESSAGE
+      rules:
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH !~ /^master|main$/'
