@@ -4,15 +4,4 @@ stages:
   - gate
 
 include:
-  - local: .gitlab-ci/actions/cz-commit-check.yml
-    inputs:
-      stage: gate
-      commit-message: $CI_COMMIT_MESSAGE
-      rules:
-        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH !~ /^master|main$/'
-  - local: .gitlab-ci/actions/cz-commit-check-range.yml
-    inputs:
-      stage: gate
-      rev-range: origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME..
-      rules:
-        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
+  - local: .gitlab-ci/workflows/gate-commit-check.yml
