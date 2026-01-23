@@ -36,6 +36,16 @@ include:
       rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
 
+debug:variables:
+  stage: e2e-tests:pre
+  image: alpine:3.23.2
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - echo "VAULT_ADDR is ${VAULT_ADDR:+SET}${VAULT_ADDR:-EMPTY}"
+    - echo "VAULT_APPROLE_ID is ${VAULT_APPROLE_ID:+SET}${VAULT_APPROLE_ID:-EMPTY}"
+    - echo "VAULT_APPROLE_SECRET_ID is ${VAULT_APPROLE_SECRET_ID:+SET}${VAULT_APPROLE_SECRET_ID:-EMPTY}"
+
 e2e-tests:test:
   stage: e2e-tests
   image: alpine:3.23.2
