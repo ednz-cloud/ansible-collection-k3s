@@ -35,28 +35,3 @@ include:
         kv/data/infrastructure/openstack/projects/pcp_w3rxsrj/users/tofu application_credential_secret | OS_APPLICATION_CREDENTIAL_SECRET
       rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
-
-e2e-tests:test:
-  stage: e2e-tests
-  image: alpine:3.23.2
-  needs:
-    - job: e2e-tests:pre:set-molecule-env
-      artifacts: true
-    - job: e2e-tests:pre:vault:get-secrets:pcp-w3rxsrj-dc4-a
-      artifacts: true
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
-  script:
-    - echo "ssh://git@${CI_SERVER_SHELL_SSH_HOST}:${CI_SERVER_SHELL_SSH_PORT}/${CI_PROJECT_PATH}.git"
-    - |
-      failed=0
-      for var in OS_AUTH_URL OS_IDENTITY_API_VERSION OS_REGION_NAME OS_APPLICATION_CREDENTIAL_ID OS_APPLICATION_CREDENTIAL_SECRET OS_AUTH_TYPE OS_INTERFACE; do
-        eval val=\$$var
-        if [ -n "$val" ]; then
-          echo "[OK] $var is set"
-        else
-          echo "[FAIL] $var is NOT set"
-          failed=1
-        fi
-      done
-      exit $failed
