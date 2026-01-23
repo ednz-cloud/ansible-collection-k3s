@@ -47,6 +47,7 @@ e2e-tests:test:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
   script:
+    - echo "ssh://git@${CI_SERVER_SHELL_SSH_HOST}:${CI_SERVER_SHELL_SSH_PORT}/${CI_PROJECT_PATH}.git"
     - |
       failed=0
       for var in OS_AUTH_URL OS_IDENTITY_API_VERSION OS_REGION_NAME OS_APPLICATION_CREDENTIAL_ID OS_APPLICATION_CREDENTIAL_SECRET OS_AUTH_TYPE OS_INTERFACE; do
