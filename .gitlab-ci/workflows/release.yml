@@ -12,7 +12,7 @@ include:
       vault_approle_secret_id: $VAULT_APPROLE_SECRET_ID
       vault_secrets: |
         kv/data/applications/gitlab/bots/ednz_cloud_bot ssh_private_key | RELEASE_SSH_PRIVATE_KEY:base64
-      artifacts_expire_in: 30 mins
+      artifacts_expire_in: 20 mins
       rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
         - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^master|main$/ && $CI_COMMIT_MESSAGE  !~ /^bump:(.?)*/'
