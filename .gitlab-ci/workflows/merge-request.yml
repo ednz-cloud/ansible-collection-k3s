@@ -42,7 +42,7 @@ e2e-tests:test:
   needs:
     - job: e2e-tests:pre:set-molecule-env
       artifacts: true
-    - job: e2e-tests:pre:vault-get-secrets:pcp-w3rxsrj-dc4-a
+    - job: e2e-tests:pre:vault:get-secrets:pcp-w3rxsrj-dc4-a
       artifacts: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
