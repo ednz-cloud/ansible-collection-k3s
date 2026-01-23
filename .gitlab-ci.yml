@@ -2,6 +2,9 @@
 # yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
 stages:
   - gate
+  - e2e-tests:pre
+  - e2e-tests
 
 include:
   - local: .gitlab-ci/workflows/gate-commit-check.yml
+  - local: .gitlab-ci/workflows/merge-request.yml
