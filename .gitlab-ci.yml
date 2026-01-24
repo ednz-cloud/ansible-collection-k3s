@@ -9,5 +9,6 @@ stages:
 
 include:
   - local: .gitlab-ci/workflows/gate-commit-check.yml
+  - local: .gitlab-ci/worklfows/gate-ansible-lint.yml
   - local: .gitlab-ci/workflows/merge-request.yml
   - local: .gitlab-ci/workflows/release.yml
