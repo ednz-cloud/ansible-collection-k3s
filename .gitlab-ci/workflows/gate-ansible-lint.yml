@@ -8,4 +8,6 @@ include:
       stage: gate
       config_file: .ansible-lint
       rules:
+        # Run on main to get a baseline for code quality
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^master|main$/ && $CI_COMMIT_MESSAGE  !~ /^bump:(.?)*/'
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
