@@ -1,5 +1,4 @@
 ---
-# Based on ansible-lint config
 extends: default
 
 rules:
@@ -33,6 +32,8 @@ rules:
   new-line-at-end-of-file: enable
   new-lines:
     type: unix
+  octal-values:
+    forbid-implicit-octal: true
   trailing-spaces: enable
   truthy:
     allowed-values:
