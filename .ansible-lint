@@ -11,7 +11,6 @@ profile: production # min, basic, moderate,safety, shared, production
 # option are parsed relative to the CWD of execution.
 exclude_paths:
   - .gitlab-ci.yml
-  - .gitea/**
   - .gitlab-ci/**
   - .ansible/**
 # parseable: true
