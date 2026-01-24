@@ -1,13 +1,12 @@
 ---
-# tests/instalations file for k3s_tests
-- name: "K3S Tests | Installation | Test binary {{ k3s_tests_binary_path }}"
+- name: "tests | installation | Test binary {{ k3s_tests_binary_path }}"
   block:
-    - name: "K3S Tests | Installation | Stat binary {{ k3s_tests_binary_path }}"
+    - name: "tests | installation | Stat binary {{ k3s_tests_binary_path }}"
       ansible.builtin.stat:
         path: "{{ k3s_tests_binary_path }}"
       register: _k3s_tests_stat_binary
 
-    - name: "K3S Tests | Installation | Verify binary {{ k3s_tests_binary_path }}"
+    - name: "tests | installation | Verify binary {{ k3s_tests_binary_path }}"
       ansible.builtin.assert:
         that:
           - _k3s_tests_stat_binary.stat.exists
@@ -18,29 +17,29 @@
         fail_msg: "K3s binary verification failed"
         success_msg: "K3s binary verified successfully"
 
-- name: "K3S Tests | Installation | Test directory {{ k3s_tests_config_dir }}"
+- name: "tests | installation | Test directory {{ k3s_tests_config_dir }}"
   block:
-    - name: "K3S Tests | Installation | Stat directory {{ k3s_tests_config_dir }}"
+    - name: "tests | installation | Stat directory {{ k3s_tests_config_dir }}"
       ansible.builtin.stat:
         path: "{{ k3s_tests_config_dir }}"
       register: _k3s_tests_stat_config_dir
 
-    - name: "K3S Tests | Installation | Stat file {{ k3s_tests_env_file_path }}"
+    - name: "tests | installation | Stat file {{ k3s_tests_env_file_path }}"
       ansible.builtin.stat:
         path: "{{ k3s_tests_env_file_path }}"
       register: _k3s_tests_stat_env_file
 
-    - name: "K3S Tests | Installation | Stat file {{ k3s_tests_config_file_path }}"
+    - name: "tests | installation | Stat file {{ k3s_tests_config_file_path }}"
       ansible.builtin.stat:
         path: "{{ k3s_tests_config_file_path }}"
       register: _k3s_tests_stat_config_file
 
-    - name: "K3S Tests | Installation | Slurp file {{ k3s_tests_config_file_path }}"
+    - name: "tests | installation | Slurp file {{ k3s_tests_config_file_path }}"
       ansible.builtin.slurp:
         src: "{{ k3s_tests_config_file_path }}"
       register: _k3s_tests_slurp_config_file
 
-    - name: "K3S Tests | Installation | Verify directory {{ k3s_tests_config_dir }}"
+    - name: "tests | installation | Verify directory {{ k3s_tests_config_dir }}"
       ansible.builtin.assert:
         that:
           - _k3s_tests_stat_config_dir.stat.exists
@@ -62,14 +61,14 @@
         fail_msg: "K3s configuration directory verification failed"
         success_msg: "K3s configuration directory verified successfully"
 
-- name: "K3S Tests | Installation | Test directory {{ k3s_tests_data_dir }}"
+- name: "tests | installation | Test directory {{ k3s_tests_data_dir }}"
   block:
-    - name: "K3S Tests | Installation | Stat directory {{ k3s_tests_data_dir }}"
+    - name: "tests | installation | Stat directory {{ k3s_tests_data_dir }}"
       ansible.builtin.stat:
         path: "{{ k3s_tests_data_dir }}"
       register: _k3s_tests_stat_data_dir
 
-    - name: "K3S Tests | Installation | Verify directory {{ k3s_tests_data_dir }}"
+    - name: "tests | installation | Verify directory {{ k3s_tests_data_dir }}"
       ansible.builtin.assert:
         that:
           - _k3s_tests_stat_data_dir.stat.exists
@@ -80,22 +79,22 @@
         fail_msg: "K3s data directory verification failed"
         success_msg: "K3s data directory verified successfully"
 
-- name: "K3S Tests | Installation | Test service {{ k3s_tests_service_name }}"
+- name: "tests | installation | Test service {{ k3s_tests_service_name }}"
   block:
-    - name: "K3S Tests | Installation | Get service {{ k3s_tests_service_name }}"
+    - name: "tests | installation | Get service {{ k3s_tests_service_name }}"
       ansible.builtin.service_facts:
 
-    - name: "K3S Tests | Installation | Stat file {{ k3s_tests_service_file_path }}"
+    - name: "tests | installation | Stat file {{ k3s_tests_service_file_path }}"
       ansible.builtin.stat:
         path: "{{ k3s_tests_service_file_path }}"
       register: _k3s_tests_stat_service_file
 
-    - name: "K3S Tests | Installation | Slurp file {{ k3s_tests_service_file_path }}"
+    - name: "tests | installation | Slurp file {{ k3s_tests_service_file_path }}"
       ansible.builtin.slurp:
         src: "{{ k3s_tests_service_file_path }}"
       register: _k3s_tests_slurp_service_file
 
-    - name: "K3S Tests | Installation | Verify service {{ k3s_tests_service_name }}"
+    - name: "tests | installation | Verify service {{ k3s_tests_service_name }}"
       vars:
         _k3s_tests_expected_service_file: |
           [Unit]

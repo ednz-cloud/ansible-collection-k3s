@@ -1,6 +1,5 @@
 ---
-# task/prerequisites file for k3s
-- name: "K3S | Create directory {{ k3s_config_dir }}"
+- name: "prerequisites | Create directory {{ k3s_config_dir }}"
   ansible.builtin.file:
     path: "{{ k3s_config_dir }}"
     state: directory
@@ -8,26 +7,10 @@
     group: "{{ k3s_group }}"
     mode: "0755"
 
-- name: "K3S | Create directory {{ k3s_data_dir }}"
+- name: "prerequisites | Create directory {{ k3s_data_dir }}"
   ansible.builtin.file:
     path: "{{ k3s_data_dir }}"
     state: directory
     owner: "{{ k3s_user }}"
     group: "{{ k3s_group }}"
     mode: "0755"
-# - name: "K3S | Create directory {{ k3s_certs_dir }}"
-#   ansible.builtin.file:
-#     path: "{{ k3s_certs_dir }}"
-#     state: directory
-#     owner: "{{ k3s_user }}"
-#     group: "{{ k3s_group }}"
-#     mode: "0755"
-
-# - name: "K3S | Create directory {{ k3s_logs_dir }}"
-#   ansible.builtin.file:
-#     path: "{{ k3s_logs_dir }}"
-#     state: directory
-#     owner: "{{ k3s_user }}"
-#     group: "{{ k3s_group }}"
-#     mode: "0755"
-#   when: k3s_enable_log_to_file

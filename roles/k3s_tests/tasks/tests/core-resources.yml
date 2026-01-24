@@ -1,8 +1,7 @@
 ---
-# tests/core-resources file for k3s_tests
-- name: "K3S Tests | Core Resources | Test k3s default namespaces"
+- name: "tests | core-resources | Test k3s default namespaces"
   block:
-    - name: "K3S Tests | Core Resources | Get k3s namespaces"
+    - name: "tests | core-resources | Get k3s namespaces"
       kubernetes.core.k8s_info:
         kind: Namespace
         kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
@@ -10,7 +9,7 @@
       run_once: true
       register: _k3s_tests_namespaces
 
-    - name: "K3S Tests | Core Resources | Verify k3s default namespaces"
+    - name: "tests | core-resources | Verify k3s default namespaces"
       ansible.builtin.assert:
         that:
           - _k3s_tests_namespaces.resources | selectattr('metadata.name', 'equalto', 'default') | list | length == 1
@@ -20,9 +19,9 @@
         fail_msg: "K3s default namespaces verification failed"
         success_msg: "K3s default namespaces verified successfully"
 
-- name: "K3S Tests | Core Resources | Test k3s core system pods"
+- name: "tests | core-resources | Test k3s core system pods"
   block:
-    - name: "K3S Tests | Core Resources | Get k3s system pods"
+    - name: "tests | core-resources | Get k3s system pods"
       kubernetes.core.k8s_info:
         kind: Pod
         namespace: kube-system
@@ -31,7 +30,7 @@
       run_once: true
       register: _k3s_tests_system_pods
 
-    - name: "K3S Tests | Core Resources | Verify k3s core system pods"
+    - name: "tests | core-resources | Verify k3s core system pods"
       ansible.builtin.assert:
         that:
           - _k3s_tests_system_pods.resources | length > 0

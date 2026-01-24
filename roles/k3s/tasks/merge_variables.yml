@@ -1,10 +1,9 @@
 ---
-# task/merge_variables file for k3s
-- name: "K3S | Merge configuration for server"
+- name: "merge_variables | Merge configuration for server"
   when:
     - k3s_mode == 'server'
   block:
-    - name: "K3S | Merge server specific configuration"
+    - name: "merge_variables | Merge server specific configuration"
       vars:
         _config_to_merge: "{{ k3s_server_configuration }}"
       ansible.builtin.set_fact:
@@ -13,7 +12,7 @@
           combine(_config_to_merge, recursive=true)
           }}"
 
-    - name: "K3S | Merge listeners configuration"
+    - name: "merge_variables | Merge listeners configuration"
       vars:
         _config_to_merge: "{{ k3s_server_listeners_options }}"
       ansible.builtin.set_fact:
@@ -22,7 +21,7 @@
           combine(_config_to_merge, recursive=true)
           }}"
 
-    - name: "K3S | Merge datastore configuration"
+    - name: "merge_variables | Merge datastore configuration"
       vars:
         _config_to_merge: "{{ k3s_server_datastore_options }}"
       ansible.builtin.set_fact:
@@ -31,7 +30,7 @@
           combine(_config_to_merge, recursive=true)
           }}"
 
-    - name: "K3S | Merge networking configuration"
+    - name: "merge_variables | Merge networking configuration"
       vars:
         _config_to_merge: "{{ k3s_server_networking_options }}"
       ansible.builtin.set_fact:
@@ -40,7 +39,7 @@
           combine(_config_to_merge, recursive=true)
           }}"
 
-    - name: "K3S | Merge components configuration"
+    - name: "merge_variables | Merge components configuration"
       vars:
         _config_to_merge: "{{ k3s_server_components_options }}"
       ansible.builtin.set_fact:
@@ -49,7 +48,7 @@
           combine(_config_to_merge, recursive=true)
           }}"
 
-    - name: "K3S | Merge processes flags configuration"
+    - name: "merge_variables | Merge processes flags configuration"
       vars:
         _config_to_merge: "{{ k3s_server_processes_flags_options }}"
       ansible.builtin.set_fact:
@@ -58,7 +57,7 @@
           combine(_config_to_merge, recursive=true)
           }}"
 
-    - name: "K3S | Merge experimental configuration"
+    - name: "merge_variables | Merge experimental configuration"
       vars:
         _config_to_merge: "{{ k3s_server_experimental_options }}"
       ansible.builtin.set_fact:
@@ -67,60 +66,60 @@
           combine(_config_to_merge, recursive=true)
           }}"
 
-- name: "K3S | Merge configuration for agent"
+- name: "merge_variables | Merge configuration for agent"
   when:
     - k3s_mode == 'agent'
   block:
-    - name: "K3S | Merge agent specific configuration"
+    - name: "merge_variables | Merge agent specific configuration"
       vars:
         _config_to_merge: "{{ k3s_agent_configuration }}"
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge | from_yaml, recursive=true)
           }}"
 
-    - name: "K3S | Merge networking configuration"
+    - name: "merge_variables | Merge networking configuration"
       vars:
         _config_to_merge: "{{ k3s_agent_networking_options }}"
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge | from_yaml, recursive=true)
           }}"
 
-    - name: "K3S | Merge node configuration"
+    - name: "merge_variables | Merge node configuration"
       vars:
         _config_to_merge: "{{ k3s_agent_node_options }}"
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge | from_yaml, recursive=true)
           }}"
 
-    - name: "K3S | Merge runtime configuration"
+    - name: "merge_variables | Merge runtime configuration"
       vars:
         _config_to_merge: "{{ k3s_agent_runtime_options }}"
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge | from_yaml, recursive=true)
           }}"
 
-    - name: "K3S | Merge processes flags configuration"
+    - name: "merge_variables | Merge processes flags configuration"
       vars:
         _config_to_merge: "{{ k3s_agent_processes_flags_options }}"
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge | from_yaml, recursive=true)
           }}"
 
-    - name: "K3S | Merge experimental configuration"
+    - name: "merge_variables | Merge experimental configuration"
       vars:
         _config_to_merge: "{{ k3s_agent_experimental_options }}"
       ansible.builtin.set_fact:
         k3s_configuration: "{{
           k3s_configuration |
-          combine(_config_to_merge|from_yaml, recursive=true)
+          combine(_config_to_merge | from_yaml, recursive=true)
           }}"

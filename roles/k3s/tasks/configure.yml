@@ -1,4 +1,5 @@
-- name: "K3S | Create k3s.env"
+---
+- name: "configure | Create k3s.env"
   ansible.builtin.template:
     src: k3s.env.j2
     dest: "{{ k3s_config_dir }}/k3s.env"
@@ -7,7 +8,7 @@
     mode: "0600"
   register: _k3s_env_file
 
-- name: "K3S | Create server token file"
+- name: "configure | Create server token file"
   ansible.builtin.copy:
     content: "{{ k3s_server_join_token }}"
     dest: "{{ k3s_server_token_file_path }}"
@@ -18,7 +19,7 @@
   when:
     - k3s_mode == 'server'
 
-- name: "K3S | Create agent token file"
+- name: "configure | Create agent token file"
   ansible.builtin.copy:
     content: "{{ k3s_agent_join_token }}"
     dest: "{{ k3s_agent_token_file_path }}"
@@ -27,7 +28,7 @@
     mode: "0600"
   register: _k3s_agent_token_file
 
-- name: "K3S | Copy config.yml template"
+- name: "configure | Copy config.yml template"
   ansible.builtin.template:
     src: k3s.config.yml.j2
     dest: "{{ k3s_config_path }}"
@@ -36,7 +37,7 @@
     mode: "0600"
   register: _k3s_config_file
 
-- name: "K3S | Set restart-check variable"
+- name: "configure | Set restart-check variable"
   ansible.builtin.set_fact:
     _k3s_service_need_restart: true
   when: _k3s_env_file.changed or
@@ -44,17 +45,17 @@
     _k3s_agent_token_file.changed or
     _k3s_config_file.changed
 
-- name: "K3S | Copy extra configuration files"
+- name: "configure | Copy extra configuration files"
   when: k3s_extra_files
   block:
-    - name: "K3S | Get extra file types"
+    - name: "configure | Get extra file types"
       ansible.builtin.stat:
         path: "{{ item.src }}"
       loop: "{{ k3s_extra_files_list }}"
       register: k3s_extra_file_stat
       delegate_to: localhost
 
-    - name: "K3S | Set list for file sources"
+    - name: "configure | Set list for file sources"
       vars:
         _k3s_file_sources: []
       ansible.builtin.set_fact:
@@ -65,7 +66,7 @@
         loop_var: item
       delegate_to: localhost
 
-    - name: "K3S | Set list for directory sources"
+    - name: "configure | Set list for directory sources"
       vars:
         _k3s_dir_sources: []
       ansible.builtin.set_fact:
@@ -76,7 +77,7 @@
         loop_var: item
       delegate_to: localhost
 
-    - name: "K3S | Template extra file sources"
+    - name: "configure | Template extra file sources"
       ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ item.dest | regex_replace('\\.j2$', '') }}"
@@ -86,7 +87,7 @@
       loop: "{{ _k3s_file_sources }}"
       when: _k3s_file_sources is defined
 
-    - name: "K3S | Template extra directory sources"
+    - name: "configure | Template extra directory sources"
       ansible.builtin.include_tasks: recursive_copy_extra_dirs.yml
       loop: "{{ _k3s_dir_sources }}"
       loop_control:

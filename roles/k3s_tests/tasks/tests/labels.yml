@@ -1,9 +1,9 @@
 ---
 # tests/labels file for k3s_tests
-- name: "K3S Tests | Labels | Test expected labels are applied"
+- name: "tests | labels | Test expected labels are applied"
   when: k3s_tests_expected_labels | length > 0
   block:
-    - name: "K3S Tests | Labels | Get node labels"
+    - name: "tests | labels | Get node labels"
       kubernetes.core.k8s_info:
         kind: Node
         name: "{{ ansible_hostname }}"
@@ -11,7 +11,7 @@
       delegate_to: "{{ k3s_tests_delegation_target }}"
       register: _k3s_tests_node_labels
 
-    - name: "K3S Tests | Labels | Verify expected labels exist"
+    - name: "tests | labels | Verify expected labels exist"
       vars:
         _k3s_tests_label_checks: >-
           {{
@@ -32,10 +32,10 @@
         loop_var: item
         label: "{{ item.key }}"
 
-- name: "K3S Tests | Labels | Test absent labels are removed"
+- name: "tests | labels | Test absent labels are removed"
   when: k3s_tests_absent_labels | length > 0
   block:
-    - name: "K3S Tests | Labels | Get node labels"
+    - name: "tests | labels | Get node labels"
       kubernetes.core.k8s_info:
         kind: Node
         name: "{{ ansible_hostname }}"
@@ -43,7 +43,7 @@
       delegate_to: "{{ k3s_tests_delegation_target }}"
       register: _k3s_tests_node_absent_labels
 
-    - name: "K3S Tests | Labels | Verify absent labels are not present"
+    - name: "tests | labels | Verify absent labels are not present"
       ansible.builtin.assert:
         that:
           - _k3s_tests_node_absent_labels.resources[0].metadata.labels[item] is not defined
@@ -53,9 +53,9 @@
       loop_control:
         loop_var: item
 
-- name: "K3S Tests | Labels | Test default Kubernetes labels are preserved"
+- name: "tests | labels | Test default Kubernetes labels are preserved"
   block:
-    - name: "K3S Tests | Labels | Get node labels"
+    - name: "tests | labels | Get node labels"
       kubernetes.core.k8s_info:
         kind: Node
         name: "{{ ansible_hostname }}"
@@ -63,7 +63,7 @@
       delegate_to: "{{ k3s_tests_delegation_target }}"
       register: _k3s_tests_node_default_labels
 
-    - name: "K3S Tests | Labels | Verify default labels are present"
+    - name: "tests | labels | Verify default labels are present"
       ansible.builtin.assert:
         that:
           - _k3s_tests_node_default_labels.resources[0].metadata.labels['kubernetes.io/hostname'] is defined

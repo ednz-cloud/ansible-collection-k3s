@@ -1,8 +1,7 @@
 ---
-# tests/cluster-health file for k3s_tests
-- name: "K3S Tests | Cluster Health | Test k3s cluster nodes"
+- name: "tests | cluster-health | Test k3s cluster nodes"
   block:
-    - name: "K3S Tests | Cluster Health | Get k3s cluster nodes"
+    - name: "tests | cluster-health | Get k3s cluster nodes"
       kubernetes.core.k8s_info:
         kind: Node
         kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
@@ -10,7 +9,7 @@
       run_once: true
       register: _k3s_tests_cluster_nodes
 
-    - name: "K3S Tests | Cluster Health | Verify k3s cluster nodes"
+    - name: "tests | cluster-health | Verify k3s cluster nodes"
       vars:
         _k3s_tests_node_count_check: >-
           {{
@@ -25,6 +24,9 @@
       ansible.builtin.assert:
         that:
           - _k3s_tests_node_count_check or _k3s_tests_node_exists_check
-          - _k3s_tests_cluster_nodes.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
+          - >-
+            _k3s_tests_cluster_nodes.resources[0].status.conditions |
+            selectattr('type', 'equalto', 'Ready') |
+            selectattr('status', 'equalto', 'True') | list | length > 0
         fail_msg: "K3s cluster nodes verification failed"
         success_msg: "K3s cluster nodes verified successfully"

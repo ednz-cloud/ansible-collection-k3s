@@ -1,5 +1,4 @@
 ---
-# task/main file for k3s
 - name: "K3S | Set reload-check & restart-check variable"
   ansible.builtin.set_fact:
     _k3s_service_need_reload: false
