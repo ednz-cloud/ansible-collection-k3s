@@ -1,3 +1,14 @@
+## v0.3.0 (2026-01-24)
+
+### Feat
+
+- add uv for dependency management
+- **roles**: add k3s_tests role
+
+### Fix
+
+- **roles/k3s_tests**: adjust workload testing for older ansible versions
+
 ## v0.2.0 (2025-12-10)
 
 ### Feat

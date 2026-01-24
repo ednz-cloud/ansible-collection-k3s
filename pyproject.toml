@@ -1,6 +1,6 @@
 [project]
 name = "ednz_cloud.k3s"
-version = "0.2.0"
+version = "0.3.0"
 description = "ednz_cloud.k3s Ansible collection"
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
