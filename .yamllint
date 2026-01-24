@@ -26,15 +26,12 @@ rules:
   indentation: enable
   key-duplicates: enable
   line-length:
-    max: 80
-    level: warning
+    max: 140
   new-line-at-end-of-file: enable
   new-lines:
     type: unix
   trailing-spaces: enable
   truthy:
     allowed-values:
-      - 'true'
-      - 'false'
-      - 'yes'
-      - 'no'
+      - "true"
+      - "false"
