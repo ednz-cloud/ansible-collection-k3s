@@ -3,7 +3,7 @@
 collections:
   - name: ednz_cloud.k3s
   - name: kubernetes.core
-    version: 6.3.0
+    version: 6.4.0
   - name: openstack.cloud
     version: 2.5.0
   - name: ansible.utils
