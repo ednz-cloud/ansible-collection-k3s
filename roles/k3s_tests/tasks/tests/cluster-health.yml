@@ -1,13 +1,21 @@
 ---
 - name: "tests | cluster-health | Test k3s cluster nodes"
   block:
-    - name: "tests | cluster-health | Get k3s cluster nodes"
+    - name: "tests | cluster-health | Wait for k3s cluster nodes to be ready"
       kubernetes.core.k8s_info:
         kind: Node
         kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
       delegate_to: "{{ k3s_tests_delegation_target }}"
       run_once: true
       register: _k3s_tests_cluster_nodes
+      until:
+        - _k3s_tests_cluster_nodes.resources | length > 0
+        - >-
+          _k3s_tests_cluster_nodes.resources[0].status.conditions |
+          selectattr('type', 'equalto', 'Ready') |
+          selectattr('status', 'equalto', 'True') | list | length > 0
+      retries: 20
+      delay: 3
 
     - name: "tests | cluster-health | Verify k3s cluster nodes"
       vars:
