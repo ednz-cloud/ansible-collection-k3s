@@ -45,4 +45,4 @@ k3s_labels_append: {}
 # Labels not in this list (and not in default labels if enabled) will be removed.
 # Use this for selective label management.
 # Leave empty to not keep any specific labels beyond defaults.
-k3s_labels_keep: [""]
+k3s_labels_keep: []

@@ -34,7 +34,9 @@
       ansible.builtin.set_fact:
         _k3s_labels_to_apply: >-
           {{
-            _k3s_labels_current_labels | ansible.utils.keep_keys(target=_k3s_labels_full_keep_list)
+            _k3s_labels_current_labels | dict2items |
+            selectattr('key', 'in', _k3s_labels_full_keep_list) |
+            items2dict
           }}
 
     - name: "K3S Labels | Add new labels to the append list"
