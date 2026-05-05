@@ -7,17 +7,17 @@ dependency:
 driver:
   name: openstack
 platforms:
-  - name: molecule__k3s_labels__default__openstack.ednz.fr
+  - name: molecule__k3s__upgrade__openstack.ednz.fr
     description: Molecule test instance.
     flavor: a2-ram4-disk20-perf1
     image: ${MOLECULE_TEST_OS:-"Debian 13 trixie"}
     user: ${MOLECULE_TEST_USER:-"debian"}
     auto_ip: false
     network:
-      name: pcp-w3rxsrj-backend-network
+      name: pcp-w3rxsrj-dc4-a-site-network
       create: false
     security_group:
-      name: molecule__k3s_labels__default__openstack
+      name: molecule__k3s__upgrade__openstack
       create: true
       description: Molecule test security group.
       rules:
@@ -37,7 +37,7 @@ provisioner:
 verifier:
   name: ansible
 scenario:
-  name: k3s_labels__default__openstack
+  name: k3s__upgrade__openstack
   test_sequence:
     - dependency
     - cleanup
@@ -46,7 +46,7 @@ scenario:
     - create
     - prepare
     - converge
-    - idempotence
+    - side_effect
     - verify
     - cleanup
     - destroy

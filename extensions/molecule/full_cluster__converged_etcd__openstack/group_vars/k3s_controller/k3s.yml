@@ -45,6 +45,8 @@ k3s_server_datastore_options:
 
 # See https://docs.k3s.io/cli/server#kubernetes-components for configuration options
 k3s_server_components_options:
+  disable-kube-proxy: true
+  disable-network-policy: true
   disable:
     - traefik
     - local-storage

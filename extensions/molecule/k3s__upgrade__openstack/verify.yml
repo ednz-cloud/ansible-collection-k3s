@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: "Run k3s tests"
+      ansible.builtin.include_role:
+        name: ednz_cloud.k3s.k3s_tests
+      vars:
+        k3s_tests_include_tests:
+          - installation
+          - cluster-health
+          - core-resources
+
+    - name: "Test: k3s version after upgrade"
+      block:
+        - name: "Get k3s version"
+          ansible.builtin.command:
+            cmd: /usr/local/bin/k3s --version
+          register: k3s_version_output
+          changed_when: false
+
+        - name: "Verify k3s version"
+          ansible.builtin.assert:
+            that:
+              - "'v1.35.1+k3s1' in k3s_version_output.stdout"
+            fail_msg: "Expected k3s version v1.35.1+k3s1 after upgrade, but got: {{ k3s_version_output.stdout }}"
+            success_msg: "k3s successfully upgraded to v1.35.1+k3s1"
