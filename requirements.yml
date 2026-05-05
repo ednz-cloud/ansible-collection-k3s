@@ -1,0 +1,12 @@
+---
+# requirements file for molecule
+collections:
+  - name: https://github.com/ednz-cloud/ansible-collection-utils.git
+    type: git
+    version: v0.11.3
+  - name: kubernetes.core
+    version: 6.3.0
+  - name: openstack.cloud
+    version: 2.5.0
+  - name: ansible.utils
+    version: 6.0.1

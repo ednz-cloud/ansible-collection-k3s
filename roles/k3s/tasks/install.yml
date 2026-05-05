@@ -6,6 +6,7 @@
       ansible.builtin.uri:
         url: "{{ k3s_github_api }}/{{ k3s_github_project }}/releases/latest"
         return_content: true
+      check_mode: false
       register: _k3s_latest_release
 
     - name: "install | Set wanted k3s version to latest tag"
@@ -60,6 +61,7 @@
       ansible.builtin.command:
         cmd: 'grep "{{ _k3s_package_name }}$" /tmp/{{ _k3s_shasum_file_name }}'
       changed_when: false
+      check_mode: false
       register: _k3s_expected_checksum_line
 
     - name: "install | Parse the expected checksum"
