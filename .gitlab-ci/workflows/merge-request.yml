@@ -45,6 +45,7 @@ include:
       scenarios:
         - k3s__default__openstack
         - k3s__pinned_version__openstack
+        - k3s__upgrade__openstack
       scenario_configs:
         - '{"MOLECULE_TEST_OS":"Debian 11 bullseye","MOLECULE_TEST_USER":"debian"}'
         - '{"MOLECULE_TEST_OS":"Debian 12 bookworm","MOLECULE_TEST_USER":"debian"}'
