@@ -309,7 +309,7 @@ wheels = [
 
 [[package]]
 name = "ednz-cloud-k3s"
-version = "0.3.1"
+version = "0.4.0"
 source = { virtual = "." }
 dependencies = [
     { name = "ansible-core" },

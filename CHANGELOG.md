@@ -1,3 +1,15 @@
+## v0.4.0 (2026-05-06)
+
+### Feat
+
+- **role/k3s_labels**: add more default labels that could come from CCM
+
+### Fix
+
+- **role/k3s_labels**: set default keep list to empty list to prevent wrongfully keeping undesired labels
+- **role/k3s_tests**: don't test CCM dependent labels
+- **roles/k3s_tests**: replace assert test by retry test for core-resource and cluster-health
+
 ## v0.3.1 (2026-02-09)
 
 ### Fix
