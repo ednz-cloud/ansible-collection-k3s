@@ -5,7 +5,7 @@ collections:
     type: git
     version: v0.11.3
   - name: kubernetes.core
-    version: 6.3.0
+    version: 6.4.0
   - name: openstack.cloud
     version: 2.5.0
   - name: ansible.utils
