@@ -1,0 +1,32 @@
+---
+# defaults file for k3s_csi
+
+# title: K3s data directory
+# required: false
+# description-lines:
+# Path to the k3s data directory. Must match the k3s role configuration.
+k3s_csi_data_dir: /var/lib/rancher/k3s
+
+# title: K3s user
+# required: false
+# description-lines:
+# The user account under which k3s runs.
+k3s_csi_user: root
+
+# title: K3s group
+# required: false
+# description-lines:
+# The group under which k3s runs.
+k3s_csi_group: root
+
+# title: CSI chart version
+# required: false
+k3s_csi_chart_version: "2.37.1"
+
+# title: CSI custom storage classes
+# required: false
+# description-lines:
+# Raw YAML string of custom StorageClasses passed to the chart's storageClass.custom value.
+# The chart creates built-in StorageClasses with volumeBindingMode Immediate by default;
+# set this to provide your own StorageClasses, e.g. with WaitForFirstConsumer.
+k3s_csi_custom_storage_classes: ""

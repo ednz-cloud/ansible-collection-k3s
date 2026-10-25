@@ -1,0 +1,38 @@
+---
+# defaults file for k3s_flux
+
+# title: K3s data directory
+# required: false
+# description-lines:
+# Path to the k3s data directory. Must match the k3s role configuration.
+k3s_flux_data_dir: /var/lib/rancher/k3s
+
+# title: K3s user
+# required: false
+# description-lines:
+# The user account under which k3s runs.
+k3s_flux_user: root
+
+# title: K3s group
+# required: false
+# description-lines:
+# The group under which k3s runs.
+k3s_flux_group: root
+
+# title: Flux chart version
+# required: false
+k3s_flux_chart_version: "2.19.1"
+
+# title: Flux Git URL
+# required: false
+# description-lines:
+# Git repository URL for Flux to sync. Leave empty to skip GitRepository/Kustomization.
+k3s_flux_git_url: ""
+
+# title: Flux Git branch
+# required: false
+k3s_flux_git_branch: "main"
+
+# title: Flux path in repo
+# required: false
+k3s_flux_git_path: "./"

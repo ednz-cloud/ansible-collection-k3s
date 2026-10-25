@@ -1,0 +1,41 @@
+{% if k3s_ccm_openstack_cloud_config | default({}) | length > 0 %}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloud-config
+  namespace: kube-system
+stringData:
+  cloud.conf: |
+    [Global]
+    auth-url    = {{ k3s_ccm_openstack_cloud_config.auth_url }}
+    region      = {{ k3s_ccm_openstack_cloud_config.region_name }}
+    tenant-name = {{ k3s_ccm_openstack_cloud_config.tenant_name }}
+    application-credential-id     = {{ k3s_ccm_openstack_cloud_config.application_credential_id }}
+    application-credential-secret = {{ k3s_ccm_openstack_cloud_config.application_credential_secret }}
+    [LoadBalancer]
+    use-octavia = true
+    [BlockStorage]
+    bs-version = auto
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: openstack-cloud-controller-manager
+  namespace: kube-system
+spec:
+  chart: openstack-cloud-controller-manager
+  repo: https://kubernetes.github.io/cloud-provider-openstack
+  version: "{{ k3s_ccm_chart_version }}"
+  targetNamespace: kube-system
+  bootstrap: true
+  valuesContent: |
+    secret:
+      create: false
+      enabled: true
+      name: cloud-config
+    nodeSelector:{% for key, value in k3s_ccm_node_selector.items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
+    dnsPolicy: {{ k3s_ccm_dns_policy }}
+{% endif %}

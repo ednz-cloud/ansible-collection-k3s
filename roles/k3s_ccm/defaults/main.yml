@@ -1,0 +1,47 @@
+---
+# defaults file for k3s_ccm
+
+# title: K3s data directory
+# required: false
+# description-lines:
+# Path to the k3s data directory. Must match the k3s role configuration.
+k3s_ccm_data_dir: /var/lib/rancher/k3s
+
+# title: K3s user
+# required: false
+# description-lines:
+# The user account under which k3s runs.
+k3s_ccm_user: root
+
+# title: K3s group
+# required: false
+# description-lines:
+# The group under which k3s runs.
+k3s_ccm_group: root
+
+# title: OpenStack cloud config
+# required: false
+# description-lines:
+# Dictionary of OpenStack credentials for the CCM Secret.
+# Must include auth_url, region_name, tenant_name, application_credential_id,
+# and application_credential_secret.
+k3s_ccm_openstack_cloud_config: {}
+
+# title: CCM chart version
+# required: false
+k3s_ccm_chart_version: "2.37.1"
+
+# title: CCM DNS policy
+# required: false
+# description-lines:
+# DNS policy for the CCM DaemonSet pods. ClusterFirst (or Default) is
+# recommended to avoid a bootstrap deadlock where CCM cannot resolve the
+# OpenStack API because CoreDNS is not yet scheduled.
+k3s_ccm_dns_policy: "ClusterFirst"
+
+# title: CCM node selector
+# required: false
+# description-lines:
+# Node selector for CCM pods. Defaults to control-plane nodes.
+k3s_ccm_node_selector:
+  node-role.kubernetes.io/control-plane: "true"

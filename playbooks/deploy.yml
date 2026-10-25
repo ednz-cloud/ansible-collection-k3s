@@ -1,0 +1,47 @@
+---
+# Example playbook for deploying a k3s cluster with OpenStack CCM, Cinder CSI, and Flux CD.
+#
+# This playbook composes the ednz_cloud.k3s collection roles:
+#   - k3s          : installs and configures k3s
+#   - k3s_ccm      : deploys OpenStack Cloud Controller Manager
+#   - k3s_csi      : deploys Cinder CSI driver
+#   - k3s_flux     : deploys Flux CD
+#   - k3s_labels   : manages node labels
+#
+# Roles are applied in order so that CCM initializes nodes before workers join,
+# preventing the node.cloudprovider.kubernetes.io/uninitialized taint deadlock.
+
+- name: Deploy k3s control plane and bootstrap add-ons
+  hosts: k3s_controller
+  become: true
+  serial: 1
+  roles:
+    - role: ednz_cloud.k3s.k3s
+      tags: ['k3s', 'controller']
+
+    - role: ednz_cloud.k3s.k3s_ccm
+      tags: ['k3s', 'ccm']
+      when: k3s_ccm_enabled | default(false)
+
+    - role: ednz_cloud.k3s.k3s_csi
+      tags: ['k3s', 'csi']
+      when: k3s_csi_enabled | default(false)
+
+    - role: ednz_cloud.k3s.k3s_flux
+      tags: ['k3s', 'flux']
+      when: k3s_flux_enabled | default(false)
+
+- name: Deploy k3s worker nodes
+  hosts: k3s_worker
+  become: true
+  roles:
+    - role: ednz_cloud.k3s.k3s
+      tags: ['k3s', 'worker']
+
+- name: Apply node labels
+  hosts: k3s
+  become: true
+  roles:
+    - role: ednz_cloud.k3s.k3s_labels
+      tags: ['k3s', 'labels']
+      when: k3s_labels_enabled | default(false)
