@@ -1,0 +1,18 @@
+---
+# tasks file for k3s_flux
+
+- name: "K3S Flux | Ensure server manifests directory exists"
+  ansible.builtin.file:
+    path: "{{ k3s_flux_data_dir }}/server/manifests"
+    state: directory
+    mode: "0755"
+    owner: "{{ k3s_flux_user }}"
+    group: "{{ k3s_flux_group }}"
+
+- name: "K3S Flux | Deploy Flux manifest"
+  ansible.builtin.template:
+    src: "flux.yaml.j2"
+    dest: "{{ k3s_flux_data_dir }}/server/manifests/flux.yaml"
+    owner: "{{ k3s_flux_user }}"
+    group: "{{ k3s_flux_group }}"
+    mode: "0600"

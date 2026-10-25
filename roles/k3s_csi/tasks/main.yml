@@ -1,0 +1,18 @@
+---
+# tasks file for k3s_csi
+
+- name: "K3S CSI | Ensure server manifests directory exists"
+  ansible.builtin.file:
+    path: "{{ k3s_csi_data_dir }}/server/manifests"
+    state: directory
+    mode: "0755"
+    owner: "{{ k3s_csi_user }}"
+    group: "{{ k3s_csi_group }}"
+
+- name: "K3S CSI | Deploy Cinder CSI manifest"
+  ansible.builtin.template:
+    src: "cinder-csi.yaml.j2"
+    dest: "{{ k3s_csi_data_dir }}/server/manifests/cinder-csi.yaml"
+    owner: "{{ k3s_csi_user }}"
+    group: "{{ k3s_csi_group }}"
+    mode: "0600"

@@ -1,4 +1,3 @@
-{% if k3s_bootstrap_flux %}
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
@@ -39,7 +38,7 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: {{ k3s_flux_git_branch | default('main') }}
+    branch: {{ k3s_flux_git_branch }}
   url: {{ k3s_flux_git_url }}
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -49,10 +48,9 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: {{ k3s_flux_git_path | default('./') }}
+  path: {{ k3s_flux_git_path }}
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
-{% endif %}
 {% endif %}
