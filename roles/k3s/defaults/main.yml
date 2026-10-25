@@ -316,4 +316,3 @@ k3s_flux_git_path: "./"
 # title: Flux chart version
 # required: false
 k3s_flux_chart_version: "2.19.1"
->>>>>>> a36aff8 (fixup! feat(k3s): add optional Cinder CSI bootstrap)

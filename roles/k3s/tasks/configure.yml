@@ -41,63 +41,59 @@
   ansible.builtin.set_fact:
     _k3s_service_need_restart: true
   when: _k3s_env_file.changed or
-    _k3s_server_token_file.changed or
-    _k3s_agent_token_file.changed or
+    _k3s_server_token_file.changed | default(false) or
+    _k3s_agent_token_file.changed | default(false) or
     _k3s_config_file.changed
 
+# ------------------------------------------------------------------
+# Bootstrap add-on manifests (server only)
+# K3s auto-deploys anything in /var/lib/rancher/k3s/server/manifests
+# without requiring a service restart.
+# ------------------------------------------------------------------
+
+- name: "configure | Ensure server manifests directory exists"
+  ansible.builtin.file:
+    path: "/var/lib/rancher/k3s/server/manifests"
+    state: directory
+    mode: "0755"
+    owner: "{{ k3s_user }}"
+    group: "{{ k3s_group }}"
+  when:
+    - k3s_mode == 'server'
+    - k3s_bootstrap_openstack_ccm or k3s_bootstrap_cinder_csi or k3s_bootstrap_flux
+
 - name: "configure | Deploy OpenStack CCM manifest"
+  ansible.builtin.template:
+    src: "openstack-ccm.yaml.j2"
+    dest: "/var/lib/rancher/k3s/server/manifests/openstack-ccm.yaml"
+    owner: "{{ k3s_user }}"
+    group: "{{ k3s_group }}"
+    mode: "0600"
   when:
     - k3s_mode == 'server'
     - k3s_bootstrap_openstack_ccm
-  block:
-    - name: "configure | Ensure server manifests directory exists"
-      ansible.builtin.file:
-        path: "/var/lib/rancher/k3s/server/manifests"
-        state: directory
-        mode: "0755"
-        owner: "{{ k3s_user }}"
-        group: "{{ k3s_group }}"
-
-    - name: "configure | Template OpenStack CCM manifest"
-      ansible.builtin.template:
-        src: "openstack-ccm.yaml.j2"
-        dest: "/var/lib/rancher/k3s/server/manifests/openstack-ccm.yaml"
-        owner: "{{ k3s_user }}"
-        group: "{{ k3s_group }}"
-        mode: "0600"
-      register: _k3s_ccm_manifest
-
-    - name: "configure | Set restart-check for CCM manifest"
-      ansible.builtin.set_fact:
-        _k3s_service_need_restart: true
-      when: _k3s_ccm_manifest.changed
 
 - name: "configure | Deploy Cinder CSI manifest"
+  ansible.builtin.template:
+    src: "cinder-csi.yaml.j2"
+    dest: "/var/lib/rancher/k3s/server/manifests/cinder-csi.yaml"
+    owner: "{{ k3s_user }}"
+    group: "{{ k3s_group }}"
+    mode: "0600"
   when:
     - k3s_mode == 'server'
     - k3s_bootstrap_cinder_csi
-  block:
-    - name: "configure | Ensure server manifests directory exists"
-      ansible.builtin.file:
-        path: "/var/lib/rancher/k3s/server/manifests"
-        state: directory
-        mode: "0755"
-        owner: "{{ k3s_user }}"
-        group: "{{ k3s_group }}"
 
-    - name: "configure | Template Cinder CSI manifest"
-      ansible.builtin.template:
-        src: "cinder-csi.yaml.j2"
-        dest: "/var/lib/rancher/k3s/server/manifests/cinder-csi.yaml"
-        owner: "{{ k3s_user }}"
-        group: "{{ k3s_group }}"
-        mode: "0600"
-      register: _k3s_csi_manifest
-
-    - name: "configure | Set restart-check for CSI manifest"
-      ansible.builtin.set_fact:
-        _k3s_service_need_restart: true
-      when: _k3s_csi_manifest.changed
+- name: "configure | Deploy Flux manifest"
+  ansible.builtin.template:
+    src: "flux.yaml.j2"
+    dest: "/var/lib/rancher/k3s/server/manifests/flux.yaml"
+    owner: "{{ k3s_user }}"
+    group: "{{ k3s_group }}"
+    mode: "0600"
+  when:
+    - k3s_mode == 'server'
+    - k3s_bootstrap_flux
 
 - name: "configure | Copy extra configuration files"
   when: k3s_extra_files
