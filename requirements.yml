@@ -3,7 +3,7 @@
 collections:
   - name: https://github.com/ednz-cloud/ansible-collection-utils.git
     type: git
-    version: v0.11.3
+    version: v0.13.1
   - name: kubernetes.core
     version: 6.6.0
   - name: openstack.cloud
