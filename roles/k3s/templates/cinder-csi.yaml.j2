@@ -1,0 +1,27 @@
+{% if k3s_bootstrap_cinder_csi %}
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: openstack-cinder-csi
+  namespace: kube-system
+spec:
+  chart: openstack-cinder-csi
+  repo: https://kubernetes.github.io/cloud-provider-openstack
+  version: "{{ k3s_cinder_csi_chart_version }}"
+  targetNamespace: kube-system
+  bootstrap: true
+  valuesContent: |
+    secret:
+      create: false
+      enabled: true
+      name: cloud-config
+    persistence:
+      enabled: true
+    storageClass:
+      enabled: false
+{% if k3s_cinder_custom_storage_classes | default('') | length > 0 %}
+      custom: |-
+{{ k3s_cinder_custom_storage_classes | indent(8, true) }}
+{% endif %}
+{% endif %}
