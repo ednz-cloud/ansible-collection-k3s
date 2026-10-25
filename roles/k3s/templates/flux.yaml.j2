@@ -1,0 +1,58 @@
+{% if k3s_bootstrap_flux %}
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: flux2
+  namespace: kube-system
+spec:
+  chart: flux2
+  repo: https://fluxcd-community.github.io/helm-charts
+  version: "{{ k3s_flux_chart_version }}"
+  targetNamespace: flux-system
+  createNamespace: true
+  bootstrap: true
+  valuesContent: |
+    helmController:
+      create: true
+    sourceController:
+      create: true
+    kustomizeController:
+      create: true
+    notificationController:
+      create: true
+    imageAutomationController:
+      create: false
+    imageReflectionController:
+      create: false
+    rbac:
+      create: true
+    policies:
+      create: true
+{% if k3s_flux_git_url | default('') | length > 0 %}
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: flux-system
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: {{ k3s_flux_git_branch | default('main') }}
+  url: {{ k3s_flux_git_url }}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: flux-system
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: {{ k3s_flux_git_path | default('./') }}
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+{% endif %}
+{% endif %}
