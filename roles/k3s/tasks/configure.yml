@@ -45,6 +45,33 @@
     _k3s_agent_token_file.changed or
     _k3s_config_file.changed
 
+- name: "configure | Deploy OpenStack CCM manifest"
+  when:
+    - k3s_mode == 'server'
+    - k3s_bootstrap_openstack_ccm
+  block:
+    - name: "configure | Ensure server manifests directory exists"
+      ansible.builtin.file:
+        path: "/var/lib/rancher/k3s/server/manifests"
+        state: directory
+        mode: "0755"
+        owner: "{{ k3s_user }}"
+        group: "{{ k3s_group }}"
+
+    - name: "configure | Template OpenStack CCM manifest"
+      ansible.builtin.template:
+        src: "openstack-ccm.yaml.j2"
+        dest: "/var/lib/rancher/k3s/server/manifests/openstack-ccm.yaml"
+        owner: "{{ k3s_user }}"
+        group: "{{ k3s_group }}"
+        mode: "0600"
+      register: _k3s_ccm_manifest
+
+    - name: "configure | Set restart-check for CCM manifest"
+      ansible.builtin.set_fact:
+        _k3s_service_need_restart: true
+      when: _k3s_ccm_manifest.changed
+
 - name: "configure | Copy extra configuration files"
   when: k3s_extra_files
   block:

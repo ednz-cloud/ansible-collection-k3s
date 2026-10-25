@@ -256,3 +256,23 @@ k3s_agent_processes_flags_options: {}
 # See https://docs.k3s.io/cli/agent#experimental for configuration options
 # Use with caution as these features may be unstable.
 k3s_agent_experimental_options: {}
+
+# ------------------------------------------------------------------
+# Bootstrap add-ons (optional, server only)
+# ------------------------------------------------------------------
+
+# title: Bootstrap OpenStack CCM
+# required: false
+# description-lines:
+# Whether to deploy the OpenStack Cloud Controller Manager on server nodes.
+k3s_bootstrap_openstack_ccm: false
+
+# title: OpenStack cloud config
+# required: false
+# description-lines:
+# Dictionary of OpenStack credentials for the CCM Secret.
+k3s_openstack_cloud_config: {}
+
+# title: CCM chart version
+# required: false
+k3s_openstack_ccm_chart_version: "2.37.1"
