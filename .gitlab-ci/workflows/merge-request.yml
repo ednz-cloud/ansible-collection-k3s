@@ -59,8 +59,8 @@ include:
       rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
           changes:
-            - roles/k3s/**
-            - molecule/k3s__*/**
+            - roles/k3s/**/*
+            - molecule/k3s__*/**/*
 
   - project: ednz-cloud/gitlab-ci-library
     ref: main
@@ -84,5 +84,5 @@ include:
       rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master|main$/'
           changes:
-            - roles/k3s_labels/**
-            - molecule/k3s_labels__*/**
+            - roles/k3s_labels/**/*
+            - molecule/k3s_labels__*/**/*
