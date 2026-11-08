@@ -1,0 +1,49 @@
+---
+# tests/ccm file for k3s_tests
+- name: "tests | ccm | Verify cloud-config Secret exists"
+  kubernetes.core.k8s_info:
+    kind: Secret
+    name: cloud-config
+    namespace: kube-system
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_ccm_secret
+
+- name: "tests | ccm | Assert cloud-config Secret exists"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_ccm_secret.resources | length == 1
+    fail_msg: "OpenStack CCM cloud-config Secret does not exist"
+    success_msg: "OpenStack CCM cloud-config Secret verified"
+
+- name: "tests | ccm | Verify HelmChart exists"
+  kubernetes.core.k8s_info:
+    kind: HelmChart
+    name: openstack-cloud-controller-manager
+    namespace: kube-system
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_ccm_helmchart
+
+- name: "tests | ccm | Assert HelmChart exists"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_ccm_helmchart.resources | length == 1
+    fail_msg: "OpenStack CCM HelmChart does not exist"
+    success_msg: "OpenStack CCM HelmChart verified"
+
+- name: "tests | ccm | Verify CCM manifest exists on server nodes"
+  ansible.builtin.stat:
+    path: "/var/lib/rancher/k3s/server/manifests/openstack-ccm.yaml"
+  when: k3s_tests_mode == 'server'
+  register: _k3s_tests_ccm_manifest
+
+- name: "tests | ccm | Assert CCM manifest exists on server nodes"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_ccm_manifest.stat.exists | default(false)
+    fail_msg: "OpenStack CCM manifest file not found on server node"
+    success_msg: "OpenStack CCM manifest file exists on server node"
+  when: k3s_tests_mode == 'server'

@@ -1,0 +1,69 @@
+---
+# tests/flux file for k3s_tests
+- name: "tests | flux | Verify HelmChart exists"
+  kubernetes.core.k8s_info:
+    kind: HelmChart
+    name: flux2
+    namespace: kube-system
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_flux_helmchart
+
+- name: "tests | flux | Assert HelmChart exists"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_flux_helmchart.resources | length == 1
+    fail_msg: "Flux HelmChart does not exist"
+    success_msg: "Flux HelmChart verified"
+
+- name: "tests | flux | Verify flux-system namespace exists"
+  kubernetes.core.k8s_info:
+    kind: Namespace
+    name: flux-system
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_flux_namespace
+
+- name: "tests | flux | Assert flux-system namespace exists"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_flux_namespace.resources | length == 1
+    fail_msg: "Flux system namespace does not exist"
+    success_msg: "Flux system namespace verified"
+
+- name: "tests | flux | Verify Flux pods are running"
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: flux-system
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_flux_pods
+  until:
+    - _k3s_tests_flux_pods.resources | length > 0
+    - _k3s_tests_flux_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+  retries: 20
+  delay: 3
+
+- name: "tests | flux | Assert Flux pods are running"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_flux_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+    fail_msg: "Flux pods are not running"
+    success_msg: "Flux pods verified"
+
+- name: "tests | flux | Verify Flux manifest exists on server nodes"
+  ansible.builtin.stat:
+    path: "/var/lib/rancher/k3s/server/manifests/flux.yaml"
+  when: k3s_tests_mode == 'server'
+  register: _k3s_tests_flux_manifest
+
+- name: "tests | flux | Assert Flux manifest exists on server nodes"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_flux_manifest.stat.exists | default(false)
+    fail_msg: "Flux manifest file not found on server node"
+    success_msg: "Flux manifest file exists on server node"
+  when: k3s_tests_mode == 'server'

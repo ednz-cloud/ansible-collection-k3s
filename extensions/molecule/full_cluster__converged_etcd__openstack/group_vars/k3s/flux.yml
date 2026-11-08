@@ -1,0 +1,5 @@
+---
+# Dummy Flux Git URL for molecule testing.
+# The Flux chart will be installed but cannot sync a real repo.
+flux_git_url: "https://github.com/ednz-cloud/molecule-test.git"
+k3s_flux_git_url: "{{ flux_git_url }}"

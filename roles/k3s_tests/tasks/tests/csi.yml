@@ -1,0 +1,49 @@
+---
+# tests/csi file for k3s_tests
+- name: "tests | csi | Verify HelmChart exists"
+  kubernetes.core.k8s_info:
+    kind: HelmChart
+    name: openstack-cinder-csi
+    namespace: kube-system
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_csi_helmchart
+
+- name: "tests | csi | Assert HelmChart exists"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_csi_helmchart.resources | length == 1
+    fail_msg: "Cinder CSI HelmChart does not exist"
+    success_msg: "Cinder CSI HelmChart verified"
+
+- name: "tests | csi | Verify CSI nodeplugin DaemonSet exists"
+  kubernetes.core.k8s_info:
+    kind: DaemonSet
+    name: openstack-cinder-csi-nodeplugin
+    namespace: kube-system
+    kubeconfig: "{{ k3s_tests_kubeconfig_path }}"
+  delegate_to: "{{ k3s_tests_delegation_target }}"
+  run_once: true
+  register: _k3s_tests_csi_nodeplugin
+
+- name: "tests | csi | Assert CSI nodeplugin DaemonSet exists"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_csi_nodeplugin.resources | length == 1
+    fail_msg: "Cinder CSI nodeplugin DaemonSet does not exist"
+    success_msg: "Cinder CSI nodeplugin DaemonSet verified"
+
+- name: "tests | csi | Verify CSI manifest exists on server nodes"
+  ansible.builtin.stat:
+    path: "/var/lib/rancher/k3s/server/manifests/cinder-csi.yaml"
+  when: k3s_tests_mode == 'server'
+  register: _k3s_tests_csi_manifest
+
+- name: "tests | csi | Assert CSI manifest exists on server nodes"
+  ansible.builtin.assert:
+    that:
+      - _k3s_tests_csi_manifest.stat.exists | default(false)
+    fail_msg: "Cinder CSI manifest file not found on server node"
+    success_msg: "Cinder CSI manifest file exists on server node"
+  when: k3s_tests_mode == 'server'

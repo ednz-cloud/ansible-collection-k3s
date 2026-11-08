@@ -16,6 +16,18 @@
   when: "'labels' in k3s_tests_include_tests"
   ansible.builtin.include_tasks: tests/labels.yml
 
+- name: "K3S Tests | Include CCM tests"
+  when: "'ccm' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/ccm.yml
+
+- name: "K3S Tests | Include CSI tests"
+  when: "'csi' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/csi.yml
+
+- name: "K3S Tests | Include Flux tests"
+  when: "'flux' in k3s_tests_include_tests"
+  ansible.builtin.include_tasks: tests/flux.yml
+
 - name: "K3S Tests | Include workload tests"
   when: "'workload' in k3s_tests_include_tests"
   ansible.builtin.include_tasks: tests/workload.yml

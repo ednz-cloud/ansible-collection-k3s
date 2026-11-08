@@ -1,0 +1,9 @@
+---
+# Dummy OpenStack cloud config for molecule testing.
+# The CCM chart will be installed but cannot talk to a real cloud.
+k3s_ccm_openstack_cloud_config:
+  auth_url: "https://example.com/identity"
+  region_name: "molecule-region"
+  tenant_name: "molecule-tenant"
+  application_credential_id: "molecule-cred-id"
+  application_credential_secret: "molecule-cred-secret"

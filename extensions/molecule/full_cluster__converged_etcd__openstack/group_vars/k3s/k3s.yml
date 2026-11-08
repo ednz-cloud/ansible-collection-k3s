@@ -3,3 +3,9 @@ k3s_version: v1.35.1+k3s1
 k3s_start_service: true
 k3s_config_dir: /etc/rancher/k3s
 k3s_data_dir: /var/lib/rancher/k3s
+
+# Enable collection add-ons for molecule integration testing
+k3s_ccm_enabled: true
+k3s_csi_enabled: true
+k3s_flux_enabled: true
+k3s_labels_enabled: true

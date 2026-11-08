@@ -256,4 +256,3 @@ k3s_agent_processes_flags_options: {}
 # See https://docs.k3s.io/cli/agent#experimental for configuration options
 # Use with caution as these features may be unstable.
 k3s_agent_experimental_options: {}
-
