@@ -10,13 +10,13 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - focal
         - jammy
         - noble
+        - resolute
     - name: Debian
       versions:
-        - bullseye
         - bookworm
+        - trixie
   galaxy_tags:
     - "ubuntu"
     - "debian"

@@ -47,10 +47,11 @@ include:
         - k3s__pinned_version__openstack
         - k3s__upgrade__openstack
       scenario_configs:
-        - '{"MOLECULE_TEST_OS":"Debian 11 bullseye","MOLECULE_TEST_USER":"debian"}'
         - '{"MOLECULE_TEST_OS":"Debian 12 bookworm","MOLECULE_TEST_USER":"debian"}'
+        - '{"MOLECULE_TEST_OS":"Debian 13 trixie","MOLECULE_TEST_USER":"debian"}'
         - '{"MOLECULE_TEST_OS":"Ubuntu 22.04 LTS Jammy Jellyfish","MOLECULE_TEST_USER":"ubuntu"}'
         - '{"MOLECULE_TEST_OS":"Ubuntu 24.04 LTS Noble Numbat","MOLECULE_TEST_USER":"ubuntu"}'
+        - '{"MOLECULE_TEST_OS":"Ubuntu 26.04 LTS Resolute Raccoon","MOLECULE_TEST_USER":"ubuntu"}'
       needs:
         - job: e2e-tests:pre:vault:get-secrets:pcp-w3rxsrj-dc4-a
           artifacts: true
@@ -72,10 +73,11 @@ include:
         - k3s_labels__default__openstack
         - k3s_labels__label_management__openstack
       scenario_configs:
-        - '{"MOLECULE_TEST_OS":"Debian 11 bullseye","MOLECULE_TEST_USER":"debian"}'
         - '{"MOLECULE_TEST_OS":"Debian 12 bookworm","MOLECULE_TEST_USER":"debian"}'
+        - '{"MOLECULE_TEST_OS":"Debian 13 trixie","MOLECULE_TEST_USER":"debian"}'
         - '{"MOLECULE_TEST_OS":"Ubuntu 22.04 LTS Jammy Jellyfish","MOLECULE_TEST_USER":"ubuntu"}'
         - '{"MOLECULE_TEST_OS":"Ubuntu 24.04 LTS Noble Numbat","MOLECULE_TEST_USER":"ubuntu"}'
+        - '{"MOLECULE_TEST_OS":"Ubuntu 26.04 LTS Resolute Raccoon","MOLECULE_TEST_USER":"ubuntu"}'
       needs:
         - job: e2e-tests:pre:vault:get-secrets:pcp-w3rxsrj-dc4-a
           artifacts: true
